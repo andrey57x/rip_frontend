@@ -26,14 +26,14 @@ const ReactionDetailPage: React.FC = () => {
       <div className="detail-container">
         {loading && <div className="detail-status">Загрузка...</div>}
 
-        {error && (
+        {/* {error && (
           <div className="detail-status detail-error">
             Ошибка при загрузке: {error}.{" "}
             <button className="retry-btn" onClick={() => refetch()}>
               Повторить
             </button>
           </div>
-        )}
+        )} */}
 
         {!loading && !error && !reaction && (
           <div className="detail-status">Реакция не найдена.</div>

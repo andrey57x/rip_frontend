@@ -27,7 +27,6 @@ const FiltersPanel: React.FC<Props> = ({
   onChange,
   onSearch,
   placeholder = "Поиск по названию реакции...",
-  debounceMs = 300,
 }) => {
   const [internal, setInternal] = useState<string>(value ?? "");
 
