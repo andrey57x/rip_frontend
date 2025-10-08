@@ -1,0 +1,49 @@
+:root {
+    --header-color: #5389ae;
+    --main-color: #ffffff;
+    --nav-link-color: #ffffff;
+    --nav-link-hover: #ddeff7;
+    }
+    
+    
+    .app-header {
+    background-color: var(--header-color);
+    width: 100%;
+    margin-bottom: 20px;
+    }
+    
+    
+    .app-navbar {
+    height: 100px;
+    display: flex;
+    align-items: center;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    }
+    
+    
+    .brand-img {
+    height: 80px;
+    }
+    
+    
+    .app-navbar .nav-link {
+    color: var(--nav-link-color) !important;
+    font-size: 1.1rem;
+    margin-right: 0.5rem;
+    }
+    
+    
+    .app-navbar .nav-link:hover {
+    color: var(--nav-link-hover) !important;
+    }
+    
+    
+    @media (max-width: 768px) {
+    .brand-img {
+    height: 56px;
+    }
+    .app-navbar {
+    height: auto;
+    }
+    }
