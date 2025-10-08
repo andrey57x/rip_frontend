@@ -8,7 +8,7 @@ import "./ReactionDetailPage.css";
 
 const ReactionDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { data, loading, error, refetch } = useFetchReaction(id);
+  const { data, loading, error } = useFetchReaction(id);
 
   const reaction = data as Reaction | null;
 
