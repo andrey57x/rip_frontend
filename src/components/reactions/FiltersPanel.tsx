@@ -1,7 +1,8 @@
+// ./components/reactions/FiltersPanel.tsx
+
 import React, { useEffect, useState } from "react";
 import { Form, InputGroup, Button } from "react-bootstrap";
 import "./FiltersPanel.css";
-
 type Props = {
   /** Текущее значение (контролируемый компонент) — опционально */
   value?: string;
@@ -13,14 +14,13 @@ type Props = {
   /** задержка дебаунса в миллисекундах (по умолчанию 300) */
   debounceMs?: number;
 };
-
 /**
  * FiltersPanel — простая и красивая строка поиска по названию реакции.
  * Поведение:
- *  - если передано value/onChange — работает как контролируемый компонент
- *  - если не передано — держит внутренний state
- *  - вызывает onSearch с дебаунсом при вводе (если он передан)
- *  - на Enter или нажатие кнопки вызывает onSearch сразу
+ * - если передано value/onChange — работает как контролируемый компонент
+ * - если не передано — держит внутренний state
+ * - вызывает onSearch с дебаунсом при вводе (если он передан)
+ * - на Enter или нажатие кнопки вызывает onSearch сразу
  */
 const FiltersPanel: React.FC<Props> = ({
   value,
@@ -39,14 +39,14 @@ const FiltersPanel: React.FC<Props> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
-  // Дебаунс вызова onSearch при вводе
-  useEffect(() => {
-    if (!onSearch) return;
-    const t = setTimeout(() => {
-      onSearch(internal);
-    }, debounceMs);
-    return () => clearTimeout(t);
-  }, [internal, onSearch, debounceMs]);
+  // ЭТОТ БЛОК УДАЛЕН
+  // useEffect(() => {
+  //   if (!onSearch) return;
+  //   const t = setTimeout(() => {
+  //     onSearch(internal);
+  //   }, debounceMs);
+  //   return () => clearTimeout(t);
+  // }, [internal, onSearch, debounceMs]);
 
   const handleInputChange = (v: string) => {
     if (onChange) {
@@ -55,12 +55,10 @@ const FiltersPanel: React.FC<Props> = ({
       setInternal(v);
     }
   };
-
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
     if (onSearch) onSearch(internal);
   };
-
   return (
     <form
       className="filters-panel"

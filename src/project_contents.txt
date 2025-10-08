@@ -1,0 +1,1948 @@
+File: ./main.tsx
+==========================================
+import React from 'react'
+import { createRoot } from 'react-dom/client'
+import App from './App'
+import './index.css'
+
+const container = document.getElementById('root')
+
+if (!container) throw new Error('Root element not found')
+
+createRoot(container).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+)
+
+
+
+File: ./components/reactions/FiltersPanel.css
+==========================================
+:root {
+  --body-color: #ddeeff;
+  --main-color: #ffffff;
+  --muted: #586079;
+  --accent: #5389ae;
+  --input-radius: 12px;
+  --filter-elev-bg: rgba(83,137,174,0.06);
+  --filter-border: rgba(83,137,174,0.18);
+}
+
+/* Обёртка панели — центрируем как в вашем дизайне (90% ширины) */
+.filters-panel {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 16px 0;
+  box-sizing: border-box;
+}
+
+/* Внутренний блок ввода — выделенный фон, аккуратная рамка и тень */
+.search-input-group {
+  width: 90%;
+  max-width: 920px;
+  background: linear-gradient(180deg, var(--main-color), #fbfdff);
+  border-radius: var(--input-radius);
+  border: 1px solid var(--filter-border);
+  box-shadow: 0 6px 18px var(--filter-elev-bg);
+  padding: 6px;
+  align-items: center;
+  display: flex;
+}
+
+/* Иконка лупы в начале */
+.search-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  padding: 8px 10px;
+}
+
+/* Само текстовое поле — четкий контраст и крупный шрифт */
+.search-input {
+  border: none !important;
+  outline: none !important;
+  font-size: 1.15rem;
+  padding: 12px 12px;
+  box-shadow: none;
+  flex: 1 1 auto;
+  background: transparent;
+  color: #0b2540;
+}
+
+/* Убираем внутренние тени/бордеры bootstrap */
+.search-input:focus {
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Кнопка поиска — выделенный стиль, округлые края */
+.search-button {
+  border-radius: 10px;
+  margin-left: 8px;
+  padding: 8px 16px;
+  background: var(--accent);
+  border: none;
+  color: var(--main-color);
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(15,58,90,0.12);
+}
+
+/* Hover для кнопки */
+.search-button:hover,
+.search-button:focus {
+  background: #3f7288;
+  color: var(--main-color);
+}
+
+/* Акцентная подсветка поля при фокусе всей группы */
+.search-input:focus + .search-button,
+.search-input:focus ~ .search-button {
+  box-shadow: 0 6px 14px rgba(15,58,90,0.12);
+}
+
+/* Если нужно маленькое отображение (мобильные) */
+@media (max-width: 600px) {
+  .search-input-group {
+    width: 96%;
+    padding: 6px;
+  }
+  .search-button {
+    padding: 7px 12px;
+    font-size: 0.95rem;
+  }
+  .search-input {
+    font-size: 1rem;
+    padding: 10px 8px;
+  }
+}
+
+
+
+File: ./components/reactions/ReactionsGrid.tsx
+==========================================
+import React from "react";
+import ReactionCard from "./ReactionCard";
+import "./ReactionsGrid.css";
+import type { Reaction } from "../../types/models";
+
+type Props = {
+  reactions: Reaction[];
+};
+
+const ReactionsGrid: React.FC<Props> = ({ reactions }) => {
+  if (!reactions || reactions.length === 0) {
+    return (
+      <div className="reactions-grid-empty">Нет реакций для отображения.</div>
+    );
+  }
+
+  return (
+    <section className="reactions-grid-wrap" aria-label="Список реакций">
+      <div className="reactions-grid">
+        {reactions.map((r) => (
+          <ReactionCard key={r.id} reaction={r} />
+        ))}
+      </div>
+    </section>
+  );
+};
+
+export default ReactionsGrid;
+
+
+
+File: ./components/reactions/ReactionCard.tsx
+==========================================
+import React from "react";
+import { Link } from "react-router-dom";
+import "./ReactionCard.css";
+import ImageWithFallback from "../ui/ImageWithFallback";
+import type { Reaction } from "../../types/models";
+
+type Props = {
+  reaction: Reaction;
+};
+
+/**
+ * Карточка реакции — использует ImageWithFallback для устойчивости загрузки картинки.
+ * Вся карточка — ссылка на /reactions/:id
+ */
+const ReactionCard: React.FC<Props> = ({ reaction }) => {
+  const imgSrc = reaction.img_link ?? undefined;
+
+  return (
+    <Link to={`/reactions/${reaction.id}`} className="reaction-link">
+      <article
+        className="reaction-card"
+        aria-labelledby={`reaction-title-${reaction.id}`}
+      >
+        <div className="reaction-img-wrap">
+          <ImageWithFallback
+            src={imgSrc}
+            alt={reaction.title}
+            className="reaction-img"
+            lazy={true}
+          />
+        </div>
+
+        <div className="reaction-body">
+          <h3 id={`reaction-title-${reaction.id}`} className="reaction-title">
+            {reaction.title}
+          </h3>
+
+          <p className="reaction-sub">
+            Исходный реагент:{" "}
+            <span className="reaction-sub-value">
+              {reaction.reagent ?? "-"}
+            </span>
+          </p>
+          <p className="reaction-sub">
+            Целевой продукт:{" "}
+            <span className="reaction-sub-value">
+              {reaction.product ?? "-"}
+            </span>
+          </p>
+        </div>
+      </article>
+    </Link>
+  );
+};
+
+export default ReactionCard;
+
+
+
+File: ./components/reactions/ReactionsGrid.css
+==========================================
+/* Контейнер сетки карточек — вписывается в общий стиль (ширина 90%) */
+.reactions-grid-wrap {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 24px 0;
+  box-sizing: border-box;
+}
+
+/* Собственно сетка карточек */
+.reactions-grid {
+  width: 90%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around; /* как в вашей исходной верстке */
+  gap: 20px;
+}
+
+/* Сообщение при пустом списке */
+.reactions-grid-empty {
+  width: 90%;
+  margin: 24px auto;
+  padding: 18px;
+  background: #fff;
+  border-radius: 12px;
+  text-align: center;
+  color: #243b56;
+  box-shadow: 0 4px 10px rgba(17,51,85,0.04);
+}
+
+
+
+File: ./components/reactions/ReactionCard.css
+==========================================
+:root {
+  --card-width: 400px;
+  --card-height: 600px;
+  --card-radius: 50px;
+  --card-bg: #ffffff;
+  --card-shadow: 0 8px 18px rgba(17, 51, 85, 0.06);
+  --title-color: #0b2540;
+  --muted-color: #586079;
+}
+
+/* Ссылка-обёртка — убираем подчеркивание и цвет ссылки */
+.reaction-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Карточка — визуально как в вашей лабы */
+.reaction-card {
+  width: var(--card-width);
+  height: var(--card-height);
+  background: var(--card-bg);
+  border-radius: var(--card-radius);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  margin-bottom: 20px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Наведение — чуть поднять карточку */
+.reaction-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 14px 34px rgba(17, 51, 85, 0.1);
+}
+
+/* Обёртка для изображения, фиксированные размеры чтобы картинка не ломала верстку */
+.reaction-img-wrap {
+  width: var(--card-width);
+  height: 320px;
+  flex: 0 0 320px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #f8fbfd, #ffffff);
+}
+
+/* Само изображение — растянуть по ширине, центрировать по высоте */
+.reaction-img {
+  width: 100%;
+  height: 320px;
+  object-fit: fill;
+  display: block;
+}
+
+/* Контент под изображением */
+.reaction-body {
+  width: 90%;
+  padding: 12px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Заголовок */
+.reaction-title {
+  font-size: 1.25rem;
+  margin: 0;
+  text-align: center;
+  color: var(--title-color);
+  height: 54px;
+  display: -webkit-box;
+  /* -webkit-line-clamp: 2; */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Подписи реагента и продукта */
+.reaction-sub {
+  text-align: center;
+  margin: 0;
+  color: var(--muted-color);
+  font-size: 1rem;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reaction-sub-value {
+  font-weight: 600;
+  color: #243b56;
+  margin-left: 6px;
+}
+
+/* Адаптация: при малой ширине карточки уменьшаем размер */
+@media (max-width: 420px) {
+  :root {
+    --card-width: 320px;
+    --card-height: 520px;
+  }
+  .reaction-card {
+    width: var(--card-width);
+    height: var(--card-height);
+  }
+  .reaction-img {
+    height: 260px;
+  }
+  .reaction-img-wrap {
+    height: 260px;
+  }
+}
+
+
+
+File: ./components/reactions/FiltersPanel.tsx
+==========================================
+import React, { useEffect, useState } from "react";
+import { Form, InputGroup, Button } from "react-bootstrap";
+import "./FiltersPanel.css";
+
+type Props = {
+  /** Текущее значение (контролируемый компонент) — опционально */
+  value?: string;
+  /** Колбэк при изменении (возвращает новое значение строки поиска) */
+  onChange?: (newValue: string) => void;
+  /** Колбэк, вызываемый когда пользователь «подтвердил» поиск (нажатие Enter/кнопки) */
+  onSearch?: (value: string) => void;
+  placeholder?: string;
+  /** задержка дебаунса в миллисекундах (по умолчанию 300) */
+  debounceMs?: number;
+};
+
+/**
+ * FiltersPanel — простая и красивая строка поиска по названию реакции.
+ * Поведение:
+ *  - если передано value/onChange — работает как контролируемый компонент
+ *  - если не передано — держит внутренний state
+ *  - вызывает onSearch с дебаунсом при вводе (если он передан)
+ *  - на Enter или нажатие кнопки вызывает onSearch сразу
+ */
+const FiltersPanel: React.FC<Props> = ({
+  value,
+  onChange,
+  onSearch,
+  placeholder = "Поиск по названию реакции...",
+  debounceMs = 300,
+}) => {
+  const [internal, setInternal] = useState<string>(value ?? "");
+
+  // Синхронизируем внутреннее состояние, если компонент контролируется извне
+  useEffect(() => {
+    if (typeof value !== "undefined" && value !== internal) {
+      setInternal(value);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
+
+  // Дебаунс вызова onSearch при вводе
+  useEffect(() => {
+    if (!onSearch) return;
+    const t = setTimeout(() => {
+      onSearch(internal);
+    }, debounceMs);
+    return () => clearTimeout(t);
+  }, [internal, onSearch, debounceMs]);
+
+  const handleInputChange = (v: string) => {
+    if (onChange) {
+      onChange(v);
+    } else {
+      setInternal(v);
+    }
+  };
+
+  const handleSubmit = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (onSearch) onSearch(internal);
+  };
+
+  return (
+    <form
+      className="filters-panel"
+      onSubmit={handleSubmit}
+      role="search"
+      aria-label="Поиск реакций"
+    >
+      <InputGroup className="search-input-group">
+        <InputGroup.Text className="search-icon" aria-hidden>
+          {/* Простая SVG-иконка лупы (встроенная, чтобы не требовать external icons) */}
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden
+          >
+            <path
+              d="M21 21l-4.35-4.35"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <circle
+              cx="11"
+              cy="11"
+              r="6"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </InputGroup.Text>
+
+        <Form.Control
+          type="search"
+          placeholder={placeholder}
+          aria-label="Поиск по названию реакции"
+          value={internal}
+          onChange={(e) => handleInputChange(e.target.value)}
+          className="search-input"
+        />
+
+        <Button
+          variant="primary"
+          type="submit"
+          className="search-button"
+          aria-label="Найти"
+        >
+          Поиск
+        </Button>
+      </InputGroup>
+    </form>
+  );
+};
+
+export default FiltersPanel;
+
+
+
+File: ./components/ui/ImageWithFallback.tsx
+==========================================
+import React from "react";
+import { DEFAULT_IMG } from "../../utils/constants";
+
+type Props = {
+  src?: string | null;
+  alt?: string;
+  className?: string;
+  style?: React.CSSProperties;
+  /** если true — добавит loading="lazy" */
+  lazy?: boolean;
+};
+
+/**
+ * Надёжный компонент изображения с fallback и защитой от бесконечного onError-loop.
+ * Устанавливает data-fallback-applied="true" после первой неудачной загрузки.
+ */
+const ImageWithFallback: React.FC<Props> = ({
+  src,
+  alt = "",
+  className,
+  style,
+  lazy = true,
+}) => {
+  const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    const img = e.currentTarget;
+    // Если уже применён флаг — ничего не делаем (предотвращаем цикл)
+    if (img.dataset.fallbackApplied === "true") return;
+
+    // Пометим, чтобы не пытаться ещё раз
+    img.dataset.fallbackApplied = "true";
+
+    // Если текущий src уже равен fallback (в абсолютном формате), ничего не делаем
+    try {
+      const current = new URL(img.src, window.location.href).href;
+      const fallback = new URL(DEFAULT_IMG, window.location.href).href;
+      if (current === fallback) return;
+    } catch {
+      // в крайних случаях — просто продолжим и установим fallback
+    }
+
+    img.src = DEFAULT_IMG;
+  };
+
+  return (
+    <img
+      src={src ?? DEFAULT_IMG}
+      alt={alt}
+      className={className}
+      style={style}
+      onError={handleError}
+      loading={lazy ? "lazy" : undefined}
+      // width/height можно добавить для стабильности layout
+    />
+  );
+};
+
+export default ImageWithFallback;
+
+
+
+File: ./components/layout/Breadcrumbs.tsx
+==========================================
+import React from "react";
+import { Link, useLocation } from "react-router-dom";
+import "./Breadcrumbs.css";
+
+type Crumb = {
+  title: string;
+  to?: string;
+};
+
+type Props = {
+  /* если передаёте items — будет использовано оно; иначе компонент сам построит хлебные крошки из URL */
+  items?: Crumb[];
+  /* отображать ли последний элемент как ссылку (по умолчанию false — текущая страница не ссылка) */
+  linkLast?: boolean;
+};
+
+/**
+ * Breadcrumbs
+ * - если items не переданы — строит на основе useLocation().pathname
+ * - автоматически аккумулирует пути ("/reactions/123" -> ["/reactions","/reactions/123"])
+ *
+ * Пример использования:
+ *  <Breadcrumbs />                       // авто-построение
+ *  <Breadcrumbs items={[{title: 'Главная', to: '/'}, {title: 'Реакции'}]} />
+ */
+const Breadcrumbs: React.FC<Props> = ({ items, linkLast = false }) => {
+  const location = useLocation();
+
+  const buildFromPath = (): Crumb[] => {
+    const path = location.pathname || "/";
+    if (path === "/" || path === "") return [{ title: "Главная", to: "/" }];
+
+    const parts = path.split("/").filter(Boolean); // убираем пустые сегменты
+    const crumbs: Crumb[] = [{ title: "Главная", to: "/" }];
+
+    let acc = "";
+    parts.forEach((p) => {
+      acc += `/${p}`;
+      // преобразуем сегмент в человекочитаемое название:
+      // если сегмент — число (id), покажем 'Детали' (можно заменить по задаче)
+      const title = /^\d+$/.test(p)
+        ? "Детали"
+        : decodeURIComponent(p).replace(/-/g, " ");
+      crumbs.push({ title: capitalize(title), to: acc });
+    });
+    return crumbs;
+  };
+
+  const capitalize = (s: string) =>
+    s.length ? s[0].toUpperCase() + s.slice(1) : s;
+
+  const crumbs = items && items.length ? items : buildFromPath();
+
+  return (
+    <nav aria-label="breadcrumb" className="breadcrumb-wrap">
+      <ol className="breadcrumb-list">
+        {crumbs.map((c, i) => {
+          const isLast = i === crumbs.length - 1;
+          const shouldLink = !!c.to && (!isLast || linkLast);
+          return (
+            <li key={i} className={`breadcrumb-item ${isLast ? "active" : ""}`}>
+              {shouldLink ? (
+                <Link to={c.to!} className="breadcrumb-link">
+                  {c.title}
+                </Link>
+              ) : (
+                <span className="breadcrumb-text">{c.title}</span>
+              )}
+              {!isLast && <span className="breadcrumb-sep">›</span>}
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
+  );
+};
+
+export default Breadcrumbs;
+
+
+
+File: ./components/layout/AppNavbar.tsx
+==========================================
+import React from "react";
+import { Navbar, Nav } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import "./AppNavbar.css";
+
+const AppNavbar: React.FC = () => {
+  return (
+    <header className="app-header">
+      <Navbar className="app-navbar" variant="dark">
+        {/* Вся ширина: логотип слева, ссылки справа */}
+        <div className="navbar-content">
+          <div className="brand-wrap">
+            <Link to="/" className="brand-link">
+              <img src="/img/home.png" alt="Домой" className="brand-img" />
+            </Link>
+          </div>
+
+          <Nav className="nav-links">
+            <Nav.Link as={Link} to="/" className="nav-link-text">
+              Главная
+            </Nav.Link>
+            <Nav.Link as={Link} to="/reactions" className="nav-link-text">
+              Реакции
+            </Nav.Link>
+          </Nav>
+        </div>
+      </Navbar>
+    </header>
+  );
+};
+
+export default AppNavbar;
+
+
+
+File: ./components/layout/AppNavbar.css
+==========================================
+:root {
+  --header-color: #5389ae;
+  --nav-link-color: #ffffff;
+  --nav-link-hover: #ddeff7;
+}
+
+/* Общий контейнер шапки */
+.app-header {
+  background-color: var(--header-color);
+  width: 100%;
+  height: 100px;
+  display: flex;
+  align-items: center;
+}
+
+/* Сам navbar без внутренних ограничений */
+.app-navbar {
+  width: 100%;
+}
+
+/* Контент в шапке: логотип слева, ссылки справа */
+.navbar-content {
+  width: 90%;
+  display: flex;
+  justify-content: space-between; /* Лого слева, ссылки справа */
+  align-items: center;
+  padding: 0.5%; /* Отступы по краям */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Логотип */
+.brand-wrap {
+  display: flex;
+  align-items: center;
+}
+
+.brand-link {
+  text-decoration: none;
+}
+
+.brand-img {
+  height: 80px;
+  display: block;
+}
+
+/* Ссылки справа */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin: 0;
+}
+
+/* Оформление ссылок */
+.nav-link-text {
+  color: var(--nav-link-color) !important;
+  font-size: 1.5rem;
+  text-decoration: none !important;
+  transition: color 0.2s ease;
+}
+
+.nav-link-text:hover {
+  color: var(--nav-link-hover) !important;
+}
+
+/* Убираем гамбургер (если вдруг появится) */
+.navbar-toggler {
+  display: none !important;
+}
+
+/* Адаптация для узких экранов */
+@media (max-width: 768px) {
+  .brand-img {
+    height: 60px;
+  }
+  .nav-links {
+    gap: 1rem;
+  }
+  .nav-link-text {
+    font-size: 1.1rem;
+  }
+}
+
+
+
+File: ./components/layout/Breadcrumbs.css
+==========================================
+/* Breadcrumbs.css — обновлённый, чтобы крошки хорошо выделялись */
+
+/* Переменные (можно переопределить в index.css) */
+:root {
+  --breadcrumb-bg: #ffffff;            /* фон блока крошек */
+  --breadcrumb-accent: #e6f2f8;        /* лёгкий акцент вокруг */
+  --breadcrumb-border: rgba(15,58,90,0.12);
+  --breadcrumb-text: #0b2540;
+  --breadcrumb-muted: #4b5f73;
+  --breadcrumb-radius: 12px;
+  --breadcrumb-padding-vertical: 10px;
+  --breadcrumb-padding-horizontal: 16px;
+}
+
+/* Внешняя обёртка — центрируем и даём видимый контраст */
+.breadcrumb-wrap {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 12px 0;
+  box-sizing: border-box;
+  background: transparent; /* оставляем фон страницы */
+}
+
+/* Сам блок с крошками — белый фон, тень и чуть более тёмная граница */
+.breadcrumb-list {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0;
+  padding: var(--breadcrumb-padding-vertical) var(--breadcrumb-padding-horizontal);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--breadcrumb-bg);
+  border-radius: var(--breadcrumb-radius);
+  border: 1px solid var(--breadcrumb-border);
+  box-shadow: 0 6px 18px rgba(17,51,85,0.06);
+  color: var(--breadcrumb-text);
+}
+
+/* Элемент крошки */
+.breadcrumb-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  color: var(--breadcrumb-muted);
+}
+
+/* Ссылка — видна и не подчёркнута */
+.breadcrumb-link {
+  color: var(--breadcrumb-text);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+/* Последняя крошка — активная, выделена другим цветом */
+.breadcrumb-item.active .breadcrumb-text {
+  color: var(--breadcrumb-text);
+  font-weight: 600;
+}
+
+/* Разделитель — крупнее и более контрастный */
+.breadcrumb-sep {
+  color: rgba(15,58,90,0.28);
+  font-weight: 600;
+  margin: 0 6px;
+}
+
+/* Hover: подчёркиваем ссылку (легко заметно) */
+.breadcrumb-link:hover {
+  text-decoration: underline;
+  color: var(--breadcrumb-text);
+}
+
+/* Мобильная версия: уменьшаем отступы и шрифт */
+@media (max-width: 600px) {
+  .breadcrumb-list {
+    width: 94%;
+    padding: 8px 10px;
+    gap: 8px;
+  }
+  .breadcrumb-item { font-size: 0.95rem; }
+  .breadcrumb-sep { margin: 0 4px; }
+}
+
+
+
+File: ./pages/ReactionsPage.css
+==========================================
+.reactions-page {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 40px;
+}
+
+.reaction-cards-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  width: 100%;
+  margin-top: 20px;
+}
+
+/* Если нужно, можно слегка изменить стиль Breadcrumbs */
+.breadcrumbs {
+  width: 90%;
+  max-width: 900px;
+  margin: 12px auto;
+  padding: 8px 16px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(17,51,85,0.05);
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+}
+
+
+
+File: ./pages/HomePage.tsx
+==========================================
+import React from 'react'
+import Breadcrumbs from '../components/layout/Breadcrumbs'
+import './HomePage.css'
+
+const HomePage: React.FC = () => {
+  return (
+    <main className="home-page">
+      <Breadcrumbs items={[{ title: 'Главная', to: '/' }]} />
+
+      <section className="home-content">
+        <h1 className="home-title">Добро пожаловать в лабораторию химических реакций</h1>
+        <p className="home-text">
+          Здесь вы можете ознакомиться с различными химическими реакциями, их исходными реагентами, целевыми продуктами и коэффициентами преобразования. 
+          Используйте страницу «Реакции» для поиска и фильтрации интересующих вас процессов.
+        </p>
+        <p className="home-text">
+          Все данные отображаются динамически и могут быть использованы для расчётов массы веществ в химических экспериментах.
+        </p>
+      </section>
+    </main>
+  )
+}
+
+export default HomePage
+
+
+
+File: ./pages/ReactionsPage.tsx
+==========================================
+import React from "react";
+import Breadcrumbs from "../components/layout/Breadcrumbs";
+import FilterPanel from "../components/reactions/FiltersPanel";
+import ReactionCard from "../components/reactions/ReactionCard";
+import useFetchReactions from "../hooks/useFetchReactions";
+import "./ReactionsPage.css";
+
+const ReactionsPage: React.FC = () => {
+  const { data: reactions, loading, error } = useFetchReactions();
+
+  return (
+    <main className="reactions-page">
+      {/* Хлебные крошки */}
+      <Breadcrumbs
+        items={[
+          { title: "Главная", to: "/" },
+          { title: "Реакции", to: "/reactions" },
+        ]}
+      />
+
+      <FilterPanel />
+
+      {loading && <p>Загрузка...</p>}
+      {error && <p>Ошибка: {error}</p>}
+
+      <div className="reaction-cards-container">
+        {reactions.map((r) => (
+          <ReactionCard key={r.id} reaction={r} />
+        ))}
+      </div>
+    </main>
+  );
+};
+
+export default ReactionsPage;
+
+
+
+File: ./pages/ReactionDetailPage.css
+==========================================
+/* Стили для страницы детали реакции — оформлены в духе первой лабы */
+
+/* Общая страница */
+.reaction-detail-page {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 40px;
+  box-sizing: border-box;
+  background: transparent;
+}
+
+/* Контейнер контента — центрирован и 90% ширины как везде */
+.detail-container {
+  width: 90%;
+  max-width: 1100px;
+  margin: 12px auto 40px auto;
+  box-sizing: border-box;
+}
+
+/* Сообщения состояния (загрузка/ошибка) */
+.detail-status {
+  padding: 18px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(17, 51, 85, 0.04);
+  text-align: center;
+  color: #0b2540;
+  margin-bottom: 12px;
+}
+
+.detail-error {
+  color: #8b1a1a;
+}
+
+/* Retry button */
+.retry-btn {
+  margin-left: 10px;
+  background: #5389ae;
+  color: #fff;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.retry-btn:hover {
+  background: #3f7288;
+}
+
+/* Основная карточка детали */
+.detail-card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(17, 51, 85, 0.06);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Заголовок и мета */
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.detail-title {
+  margin: 0;
+  font-size: 1.6rem;
+  color: #0b2540;
+}
+
+.back-link {
+  color: #5389ae;
+  text-decoration: none;
+  font-weight: 600;
+}
+.back-link:hover {
+  color: #3f7288;
+  text-decoration: underline;
+}
+
+/* Контент — изображение слева, текст справа (на широких экранах) */
+.detail-content {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+/* Обёртка изображения — фиксированная ширина */
+.detail-image-wrap {
+  flex: 0 0 420px;
+  width: 420px;
+  height: 340px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #f8fbfd, #ffffff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 14px rgba(17, 51, 85, 0.04);
+}
+
+/* Изображение — cover */
+.detail-image {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  display: block;
+}
+
+/* Текстовая колонка */
+.detail-text {
+  flex: 1 1 360px;
+  min-width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Ряд мета-данных */
+.detail-row {
+  margin: 0;
+  font-size: 1rem;
+  color: #243b56;
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+
+/* Метки внутри */
+.detail-label {
+  color: #586079;
+  min-width: 220px;
+  font-weight: 600;
+}
+
+/* Значение */
+.detail-value {
+  color: #0b2540;
+  font-weight: 500;
+}
+
+/* Описание */
+.desc-title {
+  margin: 8px 0 0 0;
+  font-size: 1.05rem;
+  color: #0b2540;
+}
+.desc-text {
+  margin: 0;
+  color: #2b495f;
+  line-height: 1.5;
+  text-align: left;
+}
+
+/* Мобильная адаптация: картинка сверху, текст снизу */
+@media (max-width: 880px) {
+  .detail-content {
+    flex-direction: column;
+  }
+  .detail-image-wrap {
+    width: 100%;
+    height: 320px;
+  }
+  .detail-label {
+    min-width: 140px;
+  }
+}
+
+/* Малые экраны */
+@media (max-width: 420px) {
+  .detail-image-wrap {
+    height: 220px;
+  }
+  .detail-title {
+    font-size: 1.25rem;
+  }
+  .detail-label {
+    min-width: 120px;
+    font-size: 0.95rem;
+  }
+  .desc-text {
+    font-size: 0.95rem;
+  }
+}
+
+
+
+File: ./pages/ReactionDetailPage.tsx
+==========================================
+import React from "react";
+import { useParams, Link } from "react-router-dom";
+import ImageWithFallback from "../components/ui/ImageWithFallback";
+import useFetchReaction from "../hooks/useFetchReaction";
+import Breadcrumbs from "../components/layout/Breadcrumbs";
+import type { Reaction } from "../types/models";
+import "./ReactionDetailPage.css";
+
+const ReactionDetailPage: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const { data, loading, error, refetch } = useFetchReaction(id);
+
+  const reaction = data as Reaction | null;
+
+  return (
+    <main className="reaction-detail-page">
+      {/* Можно передавать готовые crumbs, чтобы показать понятный путь */}
+      <Breadcrumbs
+        items={[
+          { title: "Главная", to: "/" },
+          { title: "Реакции", to: "/reactions" },
+          { title: reaction ? reaction.title : "Загрузка..." },
+        ]}
+      />
+
+      <div className="detail-container">
+        {loading && <div className="detail-status">Загрузка...</div>}
+
+        {error && (
+          <div className="detail-status detail-error">
+            Ошибка при загрузке: {error}.{" "}
+            <button className="retry-btn" onClick={() => refetch()}>
+              Повторить
+            </button>
+          </div>
+        )}
+
+        {!loading && !error && !reaction && (
+          <div className="detail-status">Реакция не найдена.</div>
+        )}
+
+        {reaction && (
+          <article className="detail-card">
+            <div className="detail-header">
+              <h1 className="detail-title">{reaction.title}</h1>
+              <div className="detail-meta">
+                <Link to="/reactions" className="back-link">
+                  ← Назад к списку
+                </Link>
+              </div>
+            </div>
+
+            <div className="detail-content">
+              <div className="detail-image-wrap">
+                <ImageWithFallback
+                  src={reaction.img_link ?? undefined}
+                  alt={reaction.title}
+                  className="detail-image"
+                  lazy={false}
+                />
+              </div>
+
+              <div className="detail-text">
+                <p className="detail-row">
+                  <span className="detail-label">Исходный реагент:</span>{" "}
+                  <span className="detail-value">
+                    {reaction.reagent ?? "-"}
+                  </span>
+                </p>
+                <p className="detail-row">
+                  <span className="detail-label">Целевой продукт:</span>{" "}
+                  <span className="detail-value">
+                    {reaction.product ?? "-"}
+                  </span>
+                </p>
+                <p className="detail-row">
+                  <span className="detail-label">
+                    Коэффициент преобразования:
+                  </span>{" "}
+                  <span className="detail-value">
+                    {reaction.conversation_factor ?? "-"}
+                  </span>
+                </p>
+
+                <h3 className="desc-title">Описание процесса</h3>
+                <p className="desc-text">{reaction.description ?? "-"}</p>
+              </div>
+            </div>
+          </article>
+        )}
+      </div>
+    </main>
+  );
+};
+
+export default ReactionDetailPage;
+
+
+
+File: ./pages/HomePage.css
+==========================================
+/* Стили домашней страницы — в духе первой лабы */
+
+.home-page {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 40px;
+}
+
+.home-content {
+  width: 90%;
+  max-width: 900px;
+  margin: 12px auto 40px auto;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(17,51,85,0.06);
+  text-align: center;
+}
+
+.home-title {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #0b2540;
+}
+
+.home-text {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #243b56;
+  margin-bottom: 12px;
+}
+
+
+
+File: ./App.css
+==========================================
+/* Сброс отступов и базовые стили, в духе первой лабы */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 1rem;
+  color: #0b2540;
+  background-color: #ddeeff;
+  scrollbar-width: thin;
+}
+
+/* Убираем подчеркивания у ссылок по умолчанию */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Для главного контейнера всех страниц */
+main {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 12px;
+  padding-bottom: 40px;
+}
+
+
+
+File: ./types/models.ts
+==========================================
+// модели TypeScript
+
+export type Reaction = {
+  id: number
+  title: string
+  reagent: string
+  product: string
+  conversation_factor: number
+  img_link?: string | null
+  description?: string
+}
+
+
+
+File: ./hooks/useFetchReaction.ts
+==========================================
+// src/hooks/useFetchReaction.ts
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { Reaction } from "../types/models";
+import * as api from "../api/api";
+
+export default function useFetchReaction(id?: number | string) {
+  const [data, setData] = useState<Reaction | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const abortRef = useRef<AbortController | null>(null);
+
+  const fetchOne = useCallback(async (ident?: number | string) => {
+    if (!ident && ident !== 0) return;
+    abortRef.current?.abort();
+    const ac = new AbortController();
+    abortRef.current = ac;
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await api.getReaction(ident!, ac.signal);
+      setData(res);
+      setLoading(false);
+    } catch (err: any) {
+      setError(err?.message ?? "fetch error");
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (id === undefined || id === null) return;
+    fetchOne(id);
+    return () => {
+      abortRef.current?.abort();
+    };
+  }, [id, fetchOne]);
+
+  const refetch = () => fetchOne(id);
+
+  return { data, loading, error, refetch };
+}
+
+
+
+File: ./hooks/useFetchReactions.ts
+==========================================
+// src/hooks/useFetchReactions.ts
+import { useCallback, useEffect, useRef, useState } from 'react'
+import type { Reaction } from '../types/models'
+import * as api from '../api/api'
+
+type Filters = {
+  title?: string
+  date_from?: string
+  date_to?: string
+  price_min?: number
+  price_max?: number
+  limit?: number
+  offset?: number
+}
+
+/**
+ * useFetchReactions - надёжный хук для списка реакций.
+ * - при mount (если immediate = true) делает один запрос;
+ * - для последующих запросов используйте setFiltersAndFetch(f)
+ * - отменяет предыдущий запрос через AbortController при новом fetch
+ */
+export default function useFetchReactions(initialFilters?: Filters, immediate = true) {
+  const [filters, setFilters] = useState<Filters | undefined>(initialFilters)
+  const [data, setData] = useState<Reaction[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const abortRef = useRef<AbortController | null>(null)
+
+  const fetchData = useCallback(async (f?: Filters) => {
+    const applied = f ?? filters
+    // отменяем предыдущий запрос
+    abortRef.current?.abort()
+    const ac = new AbortController()
+    abortRef.current = ac
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      const res = await api.getReactions(applied, ac.signal)
+      setData(res)
+      setLoading(false)
+    } catch (err: any) {
+      if (err?.name === 'AbortError') {
+        // игнорируем
+        return
+      }
+      setError(err?.message ?? 'fetch error')
+      setLoading(false)
+    }
+  // NOTE: не включаем `filters` в зависимости, чтобы не вызывать эффект по каждой ре-инициализации
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // При монтировании один запрос (если требуется)
+  useEffect(() => {
+    if (!immediate) return
+    fetchData()
+    return () => abortRef.current?.abort()
+  // fetchData не меняется (useCallback без deps), immediate редко меняется, поэтому []/immediate ok
+  }, [immediate, fetchData])
+
+  const refetch = () => fetchData(filters)
+
+  const setFiltersAndFetch = (f: Filters) => {
+    setFilters(f)
+    // делаем fetch по переданным фильтрам (не ждём setState)
+    fetchData(f)
+  }
+
+  return {
+    data,
+    loading,
+    error,
+    filters,
+    setFilters,
+    setFiltersAndFetch,
+    refetch,
+  }
+}
+
+
+
+File: ./hooks/useDebounce.ts
+==========================================
+import { useEffect, useState } from "react";
+
+/**
+ * useDebounce - возвращает отложенное значение value через delay мс.
+ * Полезно для debounced-поиска.
+ */
+export default function useDebounce<T>(value: T, delay = 300) {
+  const [debounced, setDebounced] = useState<T>(value);
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(t);
+  }, [value, delay]);
+
+  return debounced;
+}
+
+
+
+File: ./utils/formatter.ts
+==========================================
+// Небольшие утилиты для форматирования на фронте
+
+/**
+ * Форматировать float с заданным количеством знаков после запятой
+ */
+export const formatFloat = (v: number | null | undefined, digits = 3): string =>
+  typeof v === "number" ? v.toFixed(digits) : "-";
+
+/**
+ * Обрезать длинный текст до max символов и добавить многоточие
+ */
+export const ellipsis = (s?: string | null, max = 150): string => {
+  if (!s) return "";
+  return s.length > max ? s.slice(0, max - 1).trim() + "…" : s;
+};
+
+/**
+ * Преобразовать ISO-дату в более читабельную строку (локаль)
+ */
+export const formatDate = (iso?: string | null): string => {
+  if (!iso) return "-";
+  try {
+    const d = new Date(iso);
+    return d.toLocaleDateString() + " " + d.toLocaleTimeString();
+  } catch {
+    return iso;
+  }
+};
+
+
+
+File: ./utils/constants.ts
+==========================================
+// Общие константы
+export const DEFAULT_IMG = "/img/default-reaction.png";
+export const MINIO_BASE = "http://localhost:9000";
+export const MOCK_REACTIONS_PATH = "/mock/reactions.json";
+export const BACKEND_PATH = "http://localhost:8080";
+export const API_BASE = BACKEND_PATH + "/api/v1";
+export const USE_MOCK = false;
+
+
+
+File: ./index.css
+==========================================
+/* src/index.css
+   Глобальные переменные, reset и базовые утилиты для проекта.
+   Импортируйте этот файл в main.tsx ПОСЛЕ 'bootstrap/dist/css/bootstrap.min.css'
+*/
+
+/* --- Reset / Box model --- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* --- Цвета и переменные (подставьте свои при необходимости) --- */
+:root {
+  --header-color: #5389ae;
+  --body-color: #ddeeff;
+  --main-color: #ffffff;
+  --accent: #5389ae;
+  --accent-dark: #3f7288;
+  --muted: #586079;
+  --muted-2: #4b5f73;
+  --brand-dark: #0b2540;
+  --danger: #d9534f;
+
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+
+  --site-max-width: 1200px;
+  --site-gutter: 5%; /* используется в .site-container как padding / margin */
+  --font-base-size: 16px;
+}
+
+/* --- Базовая типографика --- */
+html {
+  font-size: var(--font-base-size);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, "Noto Sans", sans-serif;
+  color: var(--brand-dark);
+  background-color: var(--body-color);
+  line-height: 1.45;
+  /* -webkit-font-feature-settings: "liga" 1; аккуратные лиги */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+}
+
+body::-webkit-scrollbar {
+  width: 0; /* Chrome, Safari, Opera */
+  height: 0; /* горизонтальная полоса */
+}
+
+/* Заголовки */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--brand-dark);
+  margin: 0 0 0.6rem 0;
+  font-weight: 600;
+}
+
+h1 {
+  font-size: 2rem;
+}
+h2 {
+  font-size: 1.6rem;
+}
+h3 {
+  font-size: 1.25rem;
+}
+
+/* Параграфы */
+p {
+  margin: 0 0 1rem 0;
+  color: #16384f;
+}
+
+/* --- Контейнеры/обертки --- */
+/* Основной центрированный контейнер: 90% ширины (как в ваших старых шаблонах) */
+.site-container {
+  width: 90%;
+  max-width: var(--site-max-width);
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+}
+
+/* Основной контент (отступ сверху/снизу) */
+.main-content {
+  padding: 20px 0 48px 0;
+}
+
+/* --- Ссылки --- */
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover,
+a:focus {
+  color: var(--accent-dark);
+  text-decoration: none;
+  outline: none;
+}
+
+/* Удаляем автоматически подчеркивание у всех ссылок, но оставляем возможность подчёркивать по hover где нужно */
+a.underline {
+  text-decoration: underline;
+}
+a.underline:hover {
+  text-decoration: none;
+}
+
+/* --- Кнопки (тонкая стилизация поверх bootstrap) --- */
+.btn-primary {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: var(--main-color);
+  box-shadow: 0 4px 12px rgba(15, 58, 90, 0.08);
+}
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--accent-dark);
+  border-color: var(--accent-dark);
+}
+
+/* --- Фокусная стилизация (доступность) --- */
+:focus-visible {
+  outline: 3px solid rgba(83, 137, 174, 0.22);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* --- Изображения --- */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* --- Утилиты --- */
+.text-center {
+  text-align: center;
+}
+.mt-1 {
+  margin-top: 0.25rem;
+}
+.mt-2 {
+  margin-top: 0.5rem;
+}
+.mt-3 {
+  margin-top: 1rem;
+}
+.mb-1 {
+  margin-bottom: 0.25rem;
+}
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+.mb-3 {
+  margin-bottom: 1rem;
+}
+
+/* visually-hidden (для доступности) */
+.visually-hidden {
+  position: absolute !important;
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  white-space: nowrap;
+}
+
+/* --- Форма / inputs --- */
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+/* Устойчивые card/панели */
+.card-like {
+  background: var(--main-color);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 20px rgba(17, 51, 85, 0.05);
+  padding: 14px;
+}
+
+/* --- Breadcrumbs / Header spacing helpers --- */
+/* Наши компоненты ориентируются на .site-container и .main-content,
+   но иногда удобно иметь глобальные отступы для секций */
+.section {
+  width: 100%;
+  padding: 20px 0;
+}
+
+/* Для мобильности: уменьшение базовых шрифтов */
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.6rem;
+  }
+  h2 {
+    font-size: 1.25rem;
+  }
+  .nav-links {
+    gap: 0.6rem;
+  } /* если используете global */
+}
+
+/* --- Специфичные коррекции для bootstrap conflicts --- */
+/* Убираем лишние margin у .navbar, если bootstrap добавляет */
+.navbar {
+  margin-bottom: 0;
+}
+
+/* Breadcrumbs блок может использовать .site-container; если нужно, поправьте в компоненте */
+
+/* --- Советы ---
+ - Импортируйте bootstrap CSS до этого файла, чтобы переопределения сработали:
+    import 'bootstrap/dist/css/bootstrap.min.css';
+    import './index.css';
+ - Дополнительно вы можете добавить @font-face или подключить Google Font, если нужно.
+*/
+
+
+
+File: ./App.tsx
+==========================================
+import React from 'react'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import AppNavbar from './components/layout/AppNavbar'
+import HomePage from './pages/HomePage'
+import ReactionsPage from './pages/ReactionsPage'
+import ReactionDetailPage from './pages/ReactionDetailPage'
+import './App.css'
+
+const App: React.FC = () => {
+  return (
+    <Router>
+      <AppNavbar />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/reactions" element={<ReactionsPage />} />
+        <Route path="/reactions/:id" element={<ReactionDetailPage />} />
+
+        {/* Перенаправление на главную при неизвестном маршруте */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Router>
+  )
+}
+
+export default App
+
+
+
+File: ./mock/reactions.json
+==========================================
+[
+  {
+    "id": 1,
+    "title": "Получение диоксида серы",
+    "reagent": "Пирит",
+    "product": "Диоксид серы",
+    "conversation_factor": 1.067,
+    "img_link": "/img/so2.png",
+    "description": "Диоксид серы получают обжигом пирита (FeS2) на воздухе: сульфиды окисляются до SO2 и образуется оксид железа. Газ на промышленных установках очищают от пыли и загрязнений и используют для производства SO3 и H2SO4."
+  },
+  {
+    "id": 2,
+    "title": "Получение триоксида серы",
+    "reagent": "Диоксид серы",
+    "product": "Серный ангидрид",
+    "conversation_factor": 1.25,
+    "img_link": "/img/so3.png",
+    "description": "Диоксид серы окисляют кислородом на катализаторе при повышенной температуре, превращая его в триоксид серы. Реакция экзотермична, протекает в несколько ступеней для увеличения выхода, и используется в контактном методе получения серного ангидрида."
+  },
+  {
+    "id": 3,
+    "title": "Производство серной кислоты",
+    "reagent": "Серный ангидрид",
+    "product": "Серная кислота",
+    "conversation_factor": 1.225,
+    "img_link": "/img/h2so4.png",
+    "description": "Триоксид серы не смешивают напрямую с водой, поэтому его сначала растворяют в концентрированной серной кислоте, образуя олеум. Затем олеум осторожно разбавляют водой, получая серную кислоту нужной концентрации для промышленного применения."
+  },
+  {
+    "id": 4,
+    "title": "Синтез аммиака",
+    "reagent": "Азот",
+    "product": "Аммиак",
+    "conversation_factor": 1.214,
+    "img_link": "/img/nh3.png",
+    "description": "Азот и водород при высоком давлении и температуре проходят через железный катализатор, образуя аммиак. Реакция обратима, поэтому непрореагировавшие газы возвращают обратно. Этот процесс известен как метод Габера-Боша для синтеза аммиака."
+  },
+  {
+    "id": 5,
+    "title": "Производство метанола",
+    "reagent": "Монооксид углерода",
+    "product": "Метанол",
+    "conversation_factor": 1.143,
+    "img_link": "/img/ch3oh.png",
+    "description": "Метанол получают гидрированием синтез-газа (смеси оксидов углерода и водорода) на медных катализаторах при повышенном давлении и умеренных температурах. В промышленности используют синтез-газ, получаемый паровым риформингом природного газа или газификацией угля и биомассы."
+  }
+]
+
+
+
+File: ./api/api.ts
+==========================================
+// src/api/api.ts
+import { API_BASE, USE_MOCK } from '../utils/constants'
+import type { Reaction } from '../types/models'
+import mockReactions from '../mock/reactions.json'
+
+type Filters = {
+  title?: string
+  limit?: number
+  offset?: number
+}
+
+const toQuery = (filters?: Filters) => {
+  if (!filters) return ''
+  const params = new URLSearchParams()
+  Object.entries(filters).forEach(([k, v]) => {
+    if (v === undefined || v === null || v === '') return
+    params.append(k, String(v))
+  })
+  const s = params.toString()
+  return s ? `?${s}` : ''
+}
+
+/**
+ * getReactions - теперь уважает флаг USE_MOCK.
+ * Если USE_MOCK === true — возвращает mock мгновенно и не делает fetch.
+ */
+export async function getReactions(filters?: Filters, signal?: AbortSignal): Promise<Reaction[]> {
+  if (USE_MOCK) {
+    // Возвращаем mock синхронно (в виде Promise), чтобы потребители всегда ожидали Promise
+    return Promise.resolve(mockReactions as Reaction[])
+  }
+
+  const qs = toQuery(filters)
+  const url = `${API_BASE}/reactions${qs}`
+
+  try {
+    const res = await fetch(url, { signal, credentials: 'include' })
+    if (!res.ok) throw new Error(`status ${res.status}`)
+    const json = (await res.json()) as Reaction[]
+    return json
+  } catch (err) {
+    console.warn('api.getReactions network error, falling back to mock', err)
+    return (mockReactions as Reaction[])
+  }
+}
+
+/**
+ * getReaction - аналогично: если USE_MOCK, берём из моков и не делаем сетевой запрос.
+ */
+export async function getReaction(id: number | string, signal?: AbortSignal): Promise<Reaction | null> {
+  if (USE_MOCK) {
+    const found = (mockReactions as Reaction[]).find((r) => String(r.id) === String(id)) || null
+    return Promise.resolve(found)
+  }
+
+  const url = `${API_BASE}/reactions/${id}`
+  try {
+    const res = await fetch(url, { signal, credentials: 'include' })
+    if (!res.ok) throw new Error(`status ${res.status}`)
+    const json = (await res.json()) as Reaction
+    return json
+  } catch (err) {
+    console.warn('api.getReaction network error, falling back to mock', err)
+    const found = (mockReactions as Reaction[]).find((r) => String(r.id) === String(id)) || null
+    return found
+  }
+}
+
+
+
