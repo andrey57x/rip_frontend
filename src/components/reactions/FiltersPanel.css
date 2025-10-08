@@ -1,0 +1,101 @@
+:root {
+  --body-color: #ddeeff;
+  --main-color: #ffffff;
+  --muted: #586079;
+  --accent: #5389ae;
+  --input-radius: 12px;
+  --filter-elev-bg: rgba(83,137,174,0.06);
+  --filter-border: rgba(83,137,174,0.18);
+}
+
+/* Обёртка панели — центрируем как в вашем дизайне (90% ширины) */
+.filters-panel {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 16px 0;
+  box-sizing: border-box;
+}
+
+/* Внутренний блок ввода — выделенный фон, аккуратная рамка и тень */
+.search-input-group {
+  width: 90%;
+  max-width: 920px;
+  background: linear-gradient(180deg, var(--main-color), #fbfdff);
+  border-radius: var(--input-radius);
+  border: 1px solid var(--filter-border);
+  box-shadow: 0 6px 18px var(--filter-elev-bg);
+  padding: 6px;
+  align-items: center;
+  display: flex;
+}
+
+/* Иконка лупы в начале */
+.search-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  padding: 8px 10px;
+}
+
+/* Само текстовое поле — четкий контраст и крупный шрифт */
+.search-input {
+  border: none !important;
+  outline: none !important;
+  font-size: 1.15rem;
+  padding: 12px 12px;
+  box-shadow: none;
+  flex: 1 1 auto;
+  background: transparent;
+  color: #0b2540;
+}
+
+/* Убираем внутренние тени/бордеры bootstrap */
+.search-input:focus {
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Кнопка поиска — выделенный стиль, округлые края */
+.search-button {
+  border-radius: 10px;
+  margin-left: 8px;
+  padding: 8px 16px;
+  background: var(--accent);
+  border: none;
+  color: var(--main-color);
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(15,58,90,0.12);
+}
+
+/* Hover для кнопки */
+.search-button:hover,
+.search-button:focus {
+  background: #3f7288;
+  color: var(--main-color);
+}
+
+/* Акцентная подсветка поля при фокусе всей группы */
+.search-input:focus + .search-button,
+.search-input:focus ~ .search-button {
+  box-shadow: 0 6px 14px rgba(15,58,90,0.12);
+}
+
+/* Если нужно маленькое отображение (мобильные) */
+@media (max-width: 600px) {
+  .search-input-group {
+    width: 96%;
+    padding: 6px;
+  }
+  .search-button {
+    padding: 7px 12px;
+    font-size: 0.95rem;
+  }
+  .search-input {
+    font-size: 1rem;
+    padding: 10px 8px;
+  }
+}

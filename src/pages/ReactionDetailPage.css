@@ -1,0 +1,189 @@
+/* Стили для страницы детали реакции — оформлены в духе первой лабы */
+
+/* Общая страница */
+.reaction-detail-page {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 40px;
+  box-sizing: border-box;
+  background: transparent;
+}
+
+/* Контейнер контента — центрирован и 90% ширины как везде */
+.detail-container {
+  width: 90%;
+  max-width: 1100px;
+  margin: 12px auto 40px auto;
+  box-sizing: border-box;
+}
+
+/* Сообщения состояния (загрузка/ошибка) */
+.detail-status {
+  padding: 18px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(17, 51, 85, 0.04);
+  text-align: center;
+  color: #0b2540;
+  margin-bottom: 12px;
+}
+
+.detail-error {
+  color: #8b1a1a;
+}
+
+/* Retry button */
+.retry-btn {
+  margin-left: 10px;
+  background: #5389ae;
+  color: #fff;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.retry-btn:hover {
+  background: #3f7288;
+}
+
+/* Основная карточка детали */
+.detail-card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(17, 51, 85, 0.06);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Заголовок и мета */
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.detail-title {
+  margin: 0;
+  font-size: 1.6rem;
+  color: #0b2540;
+}
+
+.back-link {
+  color: #5389ae;
+  text-decoration: none;
+  font-weight: 600;
+}
+.back-link:hover {
+  color: #3f7288;
+  text-decoration: underline;
+}
+
+/* Контент — изображение слева, текст справа (на широких экранах) */
+.detail-content {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+/* Обёртка изображения — фиксированная ширина */
+.detail-image-wrap {
+  flex: 0 0 420px;
+  width: 420px;
+  height: 340px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #f8fbfd, #ffffff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 14px rgba(17, 51, 85, 0.04);
+}
+
+/* Изображение — cover */
+.detail-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Текстовая колонка */
+.detail-text {
+  flex: 1 1 360px;
+  min-width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Ряд мета-данных */
+.detail-row {
+  margin: 0;
+  font-size: 1rem;
+  color: #243b56;
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+
+/* Метки внутри */
+.detail-label {
+  color: #586079;
+  min-width: 220px;
+  font-weight: 600;
+}
+
+/* Значение */
+.detail-value {
+  color: #0b2540;
+  font-weight: 500;
+}
+
+/* Описание */
+.desc-title {
+  margin: 8px 0 0 0;
+  font-size: 1.05rem;
+  color: #0b2540;
+}
+.desc-text {
+  margin: 0;
+  color: #2b495f;
+  line-height: 1.5;
+  text-align: left;
+}
+
+/* Мобильная адаптация: картинка сверху, текст снизу */
+@media (max-width: 880px) {
+  .detail-content {
+    flex-direction: column;
+  }
+  .detail-image-wrap {
+    width: 100%;
+    height: 320px;
+  }
+  .detail-label {
+    min-width: 140px;
+  }
+}
+
+/* Малые экраны */
+@media (max-width: 420px) {
+  .detail-image-wrap {
+    height: 220px;
+  }
+  .detail-title {
+    font-size: 1.25rem;
+  }
+  .detail-label {
+    min-width: 120px;
+    font-size: 0.95rem;
+  }
+  .desc-text {
+    font-size: 0.95rem;
+  }
+}

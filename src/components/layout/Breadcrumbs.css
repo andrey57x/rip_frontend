@@ -1,0 +1,86 @@
+/* Breadcrumbs.css — обновлённый, чтобы крошки хорошо выделялись */
+
+/* Переменные (можно переопределить в index.css) */
+:root {
+  --breadcrumb-bg: #ffffff;            /* фон блока крошек */
+  --breadcrumb-accent: #e6f2f8;        /* лёгкий акцент вокруг */
+  --breadcrumb-border: rgba(15,58,90,0.12);
+  --breadcrumb-text: #0b2540;
+  --breadcrumb-muted: #4b5f73;
+  --breadcrumb-radius: 12px;
+  --breadcrumb-padding-vertical: 10px;
+  --breadcrumb-padding-horizontal: 16px;
+}
+
+/* Внешняя обёртка — центрируем и даём видимый контраст */
+.breadcrumb-wrap {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 12px 0;
+  box-sizing: border-box;
+  background: transparent; /* оставляем фон страницы */
+}
+
+/* Сам блок с крошками — белый фон, тень и чуть более тёмная граница */
+.breadcrumb-list {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0;
+  padding: var(--breadcrumb-padding-vertical) var(--breadcrumb-padding-horizontal);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--breadcrumb-bg);
+  border-radius: var(--breadcrumb-radius);
+  border: 1px solid var(--breadcrumb-border);
+  box-shadow: 0 6px 18px rgba(17,51,85,0.06);
+  color: var(--breadcrumb-text);
+}
+
+/* Элемент крошки */
+.breadcrumb-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  color: var(--breadcrumb-muted);
+}
+
+/* Ссылка — видна и не подчёркнута */
+.breadcrumb-link {
+  color: var(--breadcrumb-text);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+/* Последняя крошка — активная, выделена другим цветом */
+.breadcrumb-item.active .breadcrumb-text {
+  color: var(--breadcrumb-text);
+  font-weight: 600;
+}
+
+/* Разделитель — крупнее и более контрастный */
+.breadcrumb-sep {
+  color: rgba(15,58,90,0.28);
+  font-weight: 600;
+  margin: 0 6px;
+}
+
+/* Hover: подчёркиваем ссылку (легко заметно) */
+.breadcrumb-link:hover {
+  text-decoration: underline;
+  color: var(--breadcrumb-text);
+}
+
+/* Мобильная версия: уменьшаем отступы и шрифт */
+@media (max-width: 600px) {
+  .breadcrumb-list {
+    width: 94%;
+    padding: 8px 10px;
+    gap: 8px;
+  }
+  .breadcrumb-item { font-size: 0.95rem; }
+  .breadcrumb-sep { margin: 0 4px; }
+}

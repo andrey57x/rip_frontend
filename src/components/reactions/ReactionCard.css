@@ -1,0 +1,116 @@
+:root {
+  --card-width: 400px;
+  --card-height: 600px;
+  --card-radius: 50px;
+  --card-bg: #ffffff;
+  --card-shadow: 0 8px 18px rgba(17, 51, 85, 0.06);
+  --title-color: #0b2540;
+  --muted-color: #586079;
+}
+
+/* Ссылка-обёртка — убираем подчеркивание и цвет ссылки */
+.reaction-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Карточка — визуально как в вашей лабы */
+.reaction-card {
+  width: var(--card-width);
+  height: var(--card-height);
+  background: var(--card-bg);
+  border-radius: var(--card-radius);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  margin-bottom: 20px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Наведение — чуть поднять карточку */
+.reaction-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 14px 34px rgba(17, 51, 85, 0.1);
+}
+
+/* Обёртка для изображения, фиксированные размеры чтобы картинка не ломала верстку */
+.reaction-img-wrap {
+  width: var(--card-width);
+  height: 320px;
+  flex: 0 0 320px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #f8fbfd, #ffffff);
+}
+
+/* Само изображение — растянуть по ширине, центрировать по высоте */
+.reaction-img {
+  width: 100%;
+  height: 320px;
+  object-fit: fill;
+  display: block;
+}
+
+/* Контент под изображением */
+.reaction-body {
+  width: 90%;
+  padding: 12px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Заголовок */
+.reaction-title {
+  font-size: 1.25rem;
+  margin: 0;
+  text-align: center;
+  color: var(--title-color);
+  height: 54px;
+  display: -webkit-box;
+  /* -webkit-line-clamp: 2; */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Подписи реагента и продукта */
+.reaction-sub {
+  text-align: center;
+  margin: 0;
+  color: var(--muted-color);
+  font-size: 1rem;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reaction-sub-value {
+  font-weight: 600;
+  color: #243b56;
+  margin-left: 6px;
+}
+
+/* Адаптация: при малой ширине карточки уменьшаем размер */
+@media (max-width: 420px) {
+  :root {
+    --card-width: 320px;
+    --card-height: 520px;
+  }
+  .reaction-card {
+    width: var(--card-width);
+    height: var(--card-height);
+  }
+  .reaction-img {
+    height: 260px;
+  }
+  .reaction-img-wrap {
+    height: 260px;
+  }
+}

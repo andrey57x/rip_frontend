@@ -1,49 +1,83 @@
 :root {
-    --header-color: #5389ae;
-    --main-color: #ffffff;
-    --nav-link-color: #ffffff;
-    --nav-link-hover: #ddeff7;
-    }
-    
-    
-    .app-header {
-    background-color: var(--header-color);
-    width: 100%;
-    margin-bottom: 20px;
-    }
-    
-    
-    .app-navbar {
-    height: 100px;
-    display: flex;
-    align-items: center;
-    padding-top: 8px;
-    padding-bottom: 8px;
-    }
-    
-    
-    .brand-img {
-    height: 80px;
-    }
-    
-    
-    .app-navbar .nav-link {
-    color: var(--nav-link-color) !important;
+  --header-color: #5389ae;
+  --nav-link-color: #ffffff;
+  --nav-link-hover: #ddeff7;
+}
+
+/* Общий контейнер шапки */
+.app-header {
+  background-color: var(--header-color);
+  width: 100%;
+  height: 100px;
+  display: flex;
+  align-items: center;
+}
+
+/* Сам navbar без внутренних ограничений */
+.app-navbar {
+  width: 100%;
+}
+
+/* Контент в шапке: логотип слева, ссылки справа */
+.navbar-content {
+  width: 90%;
+  display: flex;
+  justify-content: space-between; /* Лого слева, ссылки справа */
+  align-items: center;
+  padding: 0.5%; /* Отступы по краям */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Логотип */
+.brand-wrap {
+  display: flex;
+  align-items: center;
+}
+
+.brand-link {
+  text-decoration: none;
+}
+
+.brand-img {
+  height: 80px;
+  display: block;
+}
+
+/* Ссылки справа */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin: 0;
+}
+
+/* Оформление ссылок */
+.nav-link-text {
+  color: var(--nav-link-color) !important;
+  font-size: 1.5rem;
+  text-decoration: none !important;
+  transition: color 0.2s ease;
+}
+
+.nav-link-text:hover {
+  color: var(--nav-link-hover) !important;
+}
+
+/* Убираем гамбургер (если вдруг появится) */
+.navbar-toggler {
+  display: none !important;
+}
+
+/* Адаптация для узких экранов */
+@media (max-width: 768px) {
+  .brand-img {
+    height: 60px;
+  }
+  .nav-links {
+    gap: 1rem;
+  }
+  .nav-link-text {
     font-size: 1.1rem;
-    margin-right: 0.5rem;
-    }
-    
-    
-    .app-navbar .nav-link:hover {
-    color: var(--nav-link-hover) !important;
-    }
-    
-    
-    @media (max-width: 768px) {
-    .brand-img {
-    height: 56px;
-    }
-    .app-navbar {
-    height: auto;
-    }
-    }
+  }
+}

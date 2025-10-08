@@ -1,0 +1,239 @@
+/* src/index.css
+   Глобальные переменные, reset и базовые утилиты для проекта.
+   Импортируйте этот файл в main.tsx ПОСЛЕ 'bootstrap/dist/css/bootstrap.min.css'
+*/
+
+/* --- Reset / Box model --- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* --- Цвета и переменные (подставьте свои при необходимости) --- */
+:root {
+  --header-color: #5389ae;
+  --body-color: #ddeeff;
+  --main-color: #ffffff;
+  --accent: #5389ae;
+  --accent-dark: #3f7288;
+  --muted: #586079;
+  --muted-2: #4b5f73;
+  --brand-dark: #0b2540;
+  --danger: #d9534f;
+
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+
+  --site-max-width: 1200px;
+  --site-gutter: 5%; /* используется в .site-container как padding / margin */
+  --font-base-size: 16px;
+}
+
+/* --- Базовая типографика --- */
+html {
+  font-size: var(--font-base-size);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, "Noto Sans", sans-serif;
+  color: var(--brand-dark);
+  background-color: var(--body-color);
+  line-height: 1.45;
+  /* -webkit-font-feature-settings: "liga" 1; аккуратные лиги */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+}
+
+body::-webkit-scrollbar {
+  width: 0; /* Chrome, Safari, Opera */
+  height: 0; /* горизонтальная полоса */
+}
+
+/* Заголовки */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--brand-dark);
+  margin: 0 0 0.6rem 0;
+  font-weight: 600;
+}
+
+h1 {
+  font-size: 2rem;
+}
+h2 {
+  font-size: 1.6rem;
+}
+h3 {
+  font-size: 1.25rem;
+}
+
+/* Параграфы */
+p {
+  margin: 0 0 1rem 0;
+  color: #16384f;
+}
+
+/* --- Контейнеры/обертки --- */
+/* Основной центрированный контейнер: 90% ширины (как в ваших старых шаблонах) */
+.site-container {
+  width: 90%;
+  max-width: var(--site-max-width);
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+}
+
+/* Основной контент (отступ сверху/снизу) */
+.main-content {
+  padding: 20px 0 48px 0;
+}
+
+/* --- Ссылки --- */
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover,
+a:focus {
+  color: var(--accent-dark);
+  text-decoration: none;
+  outline: none;
+}
+
+/* Удаляем автоматически подчеркивание у всех ссылок, но оставляем возможность подчёркивать по hover где нужно */
+a.underline {
+  text-decoration: underline;
+}
+a.underline:hover {
+  text-decoration: none;
+}
+
+/* --- Кнопки (тонкая стилизация поверх bootstrap) --- */
+.btn-primary {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: var(--main-color);
+  box-shadow: 0 4px 12px rgba(15, 58, 90, 0.08);
+}
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--accent-dark);
+  border-color: var(--accent-dark);
+}
+
+/* --- Фокусная стилизация (доступность) --- */
+:focus-visible {
+  outline: 3px solid rgba(83, 137, 174, 0.22);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* --- Изображения --- */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* --- Утилиты --- */
+.text-center {
+  text-align: center;
+}
+.mt-1 {
+  margin-top: 0.25rem;
+}
+.mt-2 {
+  margin-top: 0.5rem;
+}
+.mt-3 {
+  margin-top: 1rem;
+}
+.mb-1 {
+  margin-bottom: 0.25rem;
+}
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+.mb-3 {
+  margin-bottom: 1rem;
+}
+
+/* visually-hidden (для доступности) */
+.visually-hidden {
+  position: absolute !important;
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  white-space: nowrap;
+}
+
+/* --- Форма / inputs --- */
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+/* Устойчивые card/панели */
+.card-like {
+  background: var(--main-color);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 20px rgba(17, 51, 85, 0.05);
+  padding: 14px;
+}
+
+/* --- Breadcrumbs / Header spacing helpers --- */
+/* Наши компоненты ориентируются на .site-container и .main-content,
+   но иногда удобно иметь глобальные отступы для секций */
+.section {
+  width: 100%;
+  padding: 20px 0;
+}
+
+/* Для мобильности: уменьшение базовых шрифтов */
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.6rem;
+  }
+  h2 {
+    font-size: 1.25rem;
+  }
+  .nav-links {
+    gap: 0.6rem;
+  } /* если используете global */
+}
+
+/* --- Специфичные коррекции для bootstrap conflicts --- */
+/* Убираем лишние margin у .navbar, если bootstrap добавляет */
+.navbar {
+  margin-bottom: 0;
+}
+
+/* Breadcrumbs блок может использовать .site-container; если нужно, поправьте в компоненте */
+
+/* --- Советы ---
+ - Импортируйте bootstrap CSS до этого файла, чтобы переопределения сработали:
+    import 'bootstrap/dist/css/bootstrap.min.css';
+    import './index.css';
+ - Дополнительно вы можете добавить @font-face или подключить Google Font, если нужно.
+*/

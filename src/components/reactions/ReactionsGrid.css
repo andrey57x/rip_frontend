@@ -1,0 +1,29 @@
+/* Контейнер сетки карточек — вписывается в общий стиль (ширина 90%) */
+.reactions-grid-wrap {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 24px 0;
+  box-sizing: border-box;
+}
+
+/* Собственно сетка карточек */
+.reactions-grid {
+  width: 90%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around; /* как в вашей исходной верстке */
+  gap: 20px;
+}
+
+/* Сообщение при пустом списке */
+.reactions-grid-empty {
+  width: 90%;
+  margin: 24px auto;
+  padding: 18px;
+  background: #fff;
+  border-radius: 12px;
+  text-align: center;
+  color: #243b56;
+  box-shadow: 0 4px 10px rgba(17,51,85,0.04);
+}
