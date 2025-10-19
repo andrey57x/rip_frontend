@@ -1,0 +1,21 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Default permissions for the app",
+  "windows": ["main"],
+  "permissions": [
+    "app:default",
+    "resources:default",
+    "menu:default",
+    "tray:default",
+    "shell:allow-open",
+    "http:allow-fetch",
+    {
+      "identifier": "http:scope",
+      "allow": [
+        { "url": "http://89.208.210.115:8006/*" },
+        { "url": "http://89.208.210.115:8001/*" }
+      ]
+    }
+  ]
+}
