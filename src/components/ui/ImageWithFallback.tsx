@@ -1,5 +1,5 @@
 import React from "react";
-import { DEFAULT_IMG } from "../../utils/constants";
+import { DEFAULT_IMG } from "../../config/config";
 
 type Props = {
   src?: string | null;

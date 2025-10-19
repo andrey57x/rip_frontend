@@ -1,0 +1,4 @@
+*.sh
+project_contents.txt
+*.key
+*.env

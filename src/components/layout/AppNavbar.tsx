@@ -11,14 +11,14 @@ const AppNavbar: React.FC = () => {
         <div className="navbar-content">
           <div className="brand-wrap">
             <Link to="/" className="brand-link">
-              <img src="/img/home.png" alt="Домой" className="brand-img" />
+              <img src={`${import.meta.env.BASE_URL}img/home.png`} alt="Домой" className="brand-img" />
             </Link>
           </div>
 
           <Nav className="nav-links">
-            <Nav.Link as={Link} to="/" className="nav-link-text">
+            {/* <Nav.Link as={Link} to="/" className="nav-link-text">
               Главная
-            </Nav.Link>
+            </Nav.Link> */}
             <Nav.Link as={Link} to="/reactions" className="nav-link-text">
               Реакции
             </Nav.Link>

@@ -8,14 +8,13 @@ import './App.css'
 
 const App: React.FC = () => {
   return (
-    <Router>
+    <Router basename="/rip_frontend">
       <AppNavbar />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/reactions" element={<ReactionsPage />} />
         <Route path="/reactions/:id" element={<ReactionDetailPage />} />
 
-        {/* Перенаправление на главную при неизвестном маршруте */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>

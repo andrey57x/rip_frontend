@@ -38,7 +38,6 @@ const FiltersPanel: React.FC<Props> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
-  // ЭТОТ БЛОК УДАЛЕН
   // useEffect(() => {
   //   if (!onSearch) return;
   //   const t = setTimeout(() => {

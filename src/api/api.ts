@@ -1,5 +1,5 @@
 // ./api/api.ts
-import { API_BASE, USE_MOCK } from "../utils/constants";
+import { API_BASE, USE_MOCK } from "../config/config";
 import type { Reaction } from "../types/models";
 import mockReactions from "../mock/reactions.json";
 

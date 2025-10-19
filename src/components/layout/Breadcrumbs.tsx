@@ -8,7 +8,7 @@ type Crumb = {
 };
 
 type Props = {
-  /* если передаёте items — будет использовано оно; иначе компонент сам построит хлебные крошки из URL */
+  /* если передать items — будет использовано оно; иначе компонент сам построит хлебные крошки из URL */
   items?: Crumb[];
   /* отображать ли последний элемент как ссылку (по умолчанию false — текущая страница не ссылка) */
   linkLast?: boolean;
@@ -37,9 +37,8 @@ const Breadcrumbs: React.FC<Props> = ({ items, linkLast = false }) => {
     parts.forEach((p) => {
       acc += `/${p}`;
       // преобразуем сегмент в человекочитаемое название:
-      // если сегмент — число (id), покажем 'Детали' (можно заменить по задаче)
       const title = /^\d+$/.test(p)
-        ? "Детали"
+        ? "Реакции"
         : decodeURIComponent(p).replace(/-/g, " ");
       crumbs.push({ title: capitalize(title), to: acc });
     });
