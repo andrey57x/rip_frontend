@@ -1,4 +1,4 @@
-/* Контейнер сетки карточек — вписывается в общий стиль (ширина 90%) */
+/* Контейнер сетки карточек */
 .reactions-grid-wrap {
   width: 100%;
   display: flex;
@@ -7,16 +7,15 @@
   box-sizing: border-box;
 }
 
-/* Собственно сетка карточек */
+/* Cетка карточек */
 .reactions-grid {
   width: 90%;
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-around; /* как в вашей исходной верстке */
+  justify-content: space-around;
   gap: 20px;
 }
 
-/* Сообщение при пустом списке */
 .reactions-grid-empty {
   width: 90%;
   margin: 24px auto;
@@ -25,5 +24,16 @@
   border-radius: 12px;
   text-align: center;
   color: #243b56;
-  box-shadow: 0 4px 10px rgba(17,51,85,0.04);
+  box-shadow: 0 4px 10px rgba(17, 51, 85, 0.04);
+}
+
+@media (max-width: 480px) {
+  .reactions-grid-wrap {
+    padding: 12px 0;
+  }
+
+  .reactions-grid {
+    gap: 12px;
+    width: 95%;
+  }
 }

@@ -4,7 +4,7 @@ import {
   BACKEND_PATH,
   FRONT_HOST,
   FRONT_PORT,
-} from "./src/config/shared_config";
+} from "./src/config/sharedConfig";
 import { VitePWA } from "vite-plugin-pwa";
 import mkcert from "vite-plugin-mkcert";
 import fs from "fs";
