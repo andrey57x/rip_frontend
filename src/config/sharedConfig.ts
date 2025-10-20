@@ -5,8 +5,8 @@ const IS_TAURI = typeof process !== "undefined" && !!process.env?.TAURI_PLATFORM
 const LOCAL_BACKEND_IP = "http://89.208.210.115:8006";
 const LOCAL_MINIO_IP = "http://89.208.210.115:8001";
 
-const PUBLIC_BACKEND_URL = "https://reagent-mass-calculation.duckdns.org";
-const PUBLIC_MINIO_URL = "https://storage-reagent-mass.duckdns.org";
+export const PUBLIC_BACKEND_URL = "https://reagent-mass-calculation.duckdns.org";
+export const PUBLIC_MINIO_URL = "https://storage-reagent-mass.duckdns.org";
 
 export const FRONT_HOST = "localhost";
 export const FRONT_PORT = 3000;

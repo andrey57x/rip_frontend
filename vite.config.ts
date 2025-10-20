@@ -1,12 +1,10 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import { BACKEND_PATH, FRONT_HOST, FRONT_PORT, ROUTER_BASENAME } from "./src/config/sharedConfig";
 import { VitePWA } from "vite-plugin-pwa";
 import mkcert from "vite-plugin-mkcert";
 import fs from "fs";
 import path from "path";
-
-const isTauri = !!process.env.TAURI_PLATFORM;
+import {FRONT_HOST, FRONT_PORT, PUBLIC_BACKEND_URL} from "./src/config/sharedConfig";
 
 export default defineConfig({
   plugins: [
@@ -14,41 +12,36 @@ export default defineConfig({
     mkcert(),
     VitePWA({
       registerType: "autoUpdate",
-      devOptions: {
-        enabled: !isTauri,
-      },
-      manifest: isTauri
-        ? false
-        : {
-            name: "Reagent Mass Calculator",
-            short_name: "Reagent Calculator",
-            start_url: ROUTER_BASENAME,
-            display: "standalone",
-            background_color: "#fdfdfd",
-            theme_color: "#db4939",
-            orientation: "portrait-primary",
-            icons: [
-              {
-                src: "/rip_frontend/img/logo192.png",
-                type: "image/png",
-                sizes: "192x192",
-              },
-              {
-                src: "/rip_frontend/img/logo512.png",
-                type: "image/png",
-                sizes: "512x512",
-              },
-            ],
+      manifest: {
+        name: "Reagent Mass Calculator",
+        short_name: "Reagent Calculator",
+        start_url: "/rip_frontend/",
+        display: "standalone",
+        background_color: "#fdfdfd",
+        theme_color: "#db4939",
+        orientation: "portrait-primary",
+        icons: [
+          {
+            src: "/rip_frontend/img/logo192.png",
+            type: "image/png",
+            sizes: "192x192",
           },
+          {
+            src: "/rip_frontend/img/logo512.png",
+            type: "image/png",
+            sizes: "512x512",
+          },
+        ],
+      },
     }),
   ],
-  base: ROUTER_BASENAME,
+  base: "/rip_frontend/",
   server: {
     host: FRONT_HOST,
     port: FRONT_PORT,
     proxy: {
       "/api": {
-        target: BACKEND_PATH,
+        target: PUBLIC_BACKEND_URL,
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, ""),
@@ -59,7 +52,4 @@ export default defineConfig({
       cert: fs.readFileSync(path.resolve(__dirname, "secure/cert.crt")),
     },
   },
-  // define: {
-  //   "process.env": process.env,
-  // },
 });
