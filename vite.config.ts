@@ -4,7 +4,7 @@ import { VitePWA } from "vite-plugin-pwa";
 import mkcert from "vite-plugin-mkcert";
 import fs from "fs";
 import path from "path";
-import {FRONT_HOST, FRONT_PORT, PUBLIC_BACKEND_URL} from "./src/config/sharedConfig";
+import {FRONT_HOST, FRONT_PORT, BACKEND_PATH} from "./src/config/sharedConfig";
 
 export default defineConfig({
   plugins: [
@@ -41,7 +41,7 @@ export default defineConfig({
     port: FRONT_PORT,
     proxy: {
       "/api": {
-        target: PUBLIC_BACKEND_URL,
+        target: BACKEND_PATH,
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, ""),

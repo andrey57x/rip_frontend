@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "Рассчет массы реагента",
+        "title": "Расчет массы реагента",
         "width": 800,
         "height": 600,
         "resizable": true,
