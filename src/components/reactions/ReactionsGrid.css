@@ -8,9 +8,10 @@
 
 .reactions-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fill, 350px);
   gap: 20px;
   width: 90%;
+  justify-content: center;
 }
 
 .reactions-grid-empty {
@@ -28,7 +29,6 @@
   .reactions-grid-wrap {
     padding: 12px 0;
   }
-
   .reactions-grid {
     gap: 12px;
     width: 95%;

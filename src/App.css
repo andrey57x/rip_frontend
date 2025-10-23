@@ -1,5 +1,3 @@
-/* Сброс отступов и базовые стили, в духе первой лабы */
-
 * {
   box-sizing: border-box;
 }
@@ -14,13 +12,11 @@ body {
   scrollbar-width: thin;
 }
 
-/* Убираем подчеркивания у ссылок по умолчанию */
 a {
   text-decoration: none;
   color: inherit;
 }
 
-/* Для главного контейнера всех страниц */
 main {
   width: 100%;
   display: flex;

@@ -1,3 +1,6 @@
+export const LOCAL_BACKEND_URL = "http://192.168.1.15:8006";
+export const LOCAL_MINIO_URL = "http://192.168.1.15:8001";
+
 export const API_BASE = "/api/v1";
 export const MINIO_PATH = "/minio";
 
