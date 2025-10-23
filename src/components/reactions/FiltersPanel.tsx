@@ -1,27 +1,14 @@
-// ./components/reactions/FiltersPanel.tsx
-
 import React, { useEffect, useState } from "react";
 import { Form, InputGroup, Button } from "react-bootstrap";
 import "./FiltersPanel.css";
 type Props = {
-  /** Текущее значение (контролируемый компонент) — опционально */
   value?: string;
-  /** Колбэк при изменении (возвращает новое значение строки поиска) */
   onChange?: (newValue: string) => void;
-  /** Колбэк, вызываемый когда пользователь «подтвердил» поиск (нажатие Enter/кнопки) */
   onSearch?: (value: string) => void;
   placeholder?: string;
-  /** задержка дебаунса в миллисекундах (по умолчанию 300) */
   debounceMs?: number;
 };
-/**
- * FiltersPanel — простая и красивая строка поиска по названию реакции.
- * Поведение:
- * - если передано value/onChange — работает как контролируемый компонент
- * - если не передано — держит внутренний state
- * - вызывает onSearch с дебаунсом при вводе (если он передан)
- * - на Enter или нажатие кнопки вызывает onSearch сразу
- */
+
 const FiltersPanel: React.FC<Props> = ({
   value,
   onChange,
@@ -30,21 +17,12 @@ const FiltersPanel: React.FC<Props> = ({
 }) => {
   const [internal, setInternal] = useState<string>(value ?? "");
 
-  // Синхронизируем внутреннее состояние, если компонент контролируется извне
   useEffect(() => {
     if (typeof value !== "undefined" && value !== internal) {
       setInternal(value);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
-  // useEffect(() => {
-  //   if (!onSearch) return;
-  //   const t = setTimeout(() => {
-  //     onSearch(internal);
-  //   }, debounceMs);
-  //   return () => clearTimeout(t);
-  // }, [internal, onSearch, debounceMs]);
 
   const handleInputChange = (v: string) => {
     if (onChange) {
@@ -66,7 +44,6 @@ const FiltersPanel: React.FC<Props> = ({
     >
       <InputGroup className="search-input-group">
         <InputGroup.Text className="search-icon" aria-hidden>
-          {/* Простая SVG-иконка лупы (встроенная, чтобы не требовать external icons) */}
           <svg
             width="18"
             height="18"

@@ -1,78 +1,64 @@
-// ./hooks/useFetchReactions.ts
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import type { Reaction } from "../types/models";
 import * as api from "../api/api";
+import mockReactions from "../mock/reactions.json";
 
 type Filters = {
   reaction_title?: string;
-  date_from?: string;
-  date_to?: string;
-  price_min?: number;
-  price_max?: number;
-  limit?: number;
-  offset?: number;
 };
 
-/**
- * useFetchReactions - надёжный хук для списка реакций.
- * - при mount (если immediate = true) делает один запрос;
- * - для последующих запросов используйте setFiltersAndFetch(f)
- * - отменяет предыдущий запрос через AbortController при новом fetch
- */
-export default function useFetchReactions(
-  initialFilters?: Filters,
-  immediate = false
-) {
-  const [filters, setFilters] = useState<Filters | undefined>(initialFilters);
+export default function useFetchReactions() {
   const [data, setData] = useState<Reaction[]>([]);
+  const [fullReactionList, setFullReactionList] = useState<Reaction[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
   const abortRef = useRef<AbortController | null>(null);
 
-  const fetchData = useCallback(async (f?: Filters) => {
-    const applied = f ?? filters;
-    // отменяем предыдущий запрос
-    abortRef.current?.abort();
-    const ac = new AbortController();
-    abortRef.current = ac;
+  const filterLocally = (searchTerm: string) => {
+    const sourceList =
+      fullReactionList.length > 0 ? fullReactionList : mockReactions;
+    const lowerCaseSearchTerm = searchTerm.toLowerCase();
 
-    // ВАЖНО: Если уже идет загрузка,
-    // и мы не делаем явного вызова fetchData с новыми фильтрами,
-    // это может быть лишний ре-рендер.
-    // Но поскольку мы контролируем вызовы через setFiltersAndFetch, это должно быть ок.
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      const res = await api.getReactions(applied, ac.signal);
-      setData(res);
-      setLoading(false);
-    } catch (err: any) {
-      if (err?.name === "AbortError") {
-        // ЭТО ВЫЗЫВАЕТСЯ, ТАК КАК МЫ ПЕРЕБРОСИЛИ ОШИБКУ В api.ts
-        // Игнорируем AbortError - это не реальная ошибка
-        return;
-      }
-      setError(err?.message ?? "fetch error");
-      setLoading(false);
+    if (!lowerCaseSearchTerm) {
+      setData(sourceList);
+      return;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
-  // При монтировании один запрос (если требуется)
-  useEffect(() => {
-    if (!immediate) return;
-    fetchData();
-    return () => abortRef.current?.abort();
-  }, [immediate, fetchData]);
+    const filtered = sourceList.filter((reaction) =>
+      reaction.title.toLowerCase().includes(lowerCaseSearchTerm)
+    );
+    setData(filtered);
+  };
 
-  const refetch = () => fetchData(filters);
+  const fetchData = useCallback(
+    async (filters?: Filters) => {
+      abortRef.current?.abort();
+      const ac = new AbortController();
+      abortRef.current = ac;
+
+      setLoading(true);
+      setError(null);
+
+      try {
+        const res = await api.getReactions(filters, ac.signal);
+        setData(res);
+        if (!filters || !filters.reaction_title) {
+          setFullReactionList(res);
+        }
+      } catch (err: any) {
+        if (err?.name === "AbortError") {
+          return;
+        }
+        setError("Сервер недоступен. Поиск выполняется по локальным данным.");
+        filterLocally(filters?.reaction_title || "");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fullReactionList]
+  );
 
   const setFiltersAndFetch = (f: Filters) => {
-    setFilters(f);
-    // делаем fetch по переданным фильтрам (не ждём setState)
     fetchData(f);
   };
 
@@ -80,9 +66,6 @@ export default function useFetchReactions(
     data,
     loading,
     error,
-    filters,
-    setFilters,
     setFiltersAndFetch,
-    refetch,
   };
 }

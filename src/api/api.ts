@@ -1,4 +1,3 @@
-// ./api/api.ts
 import { API_BASE, USE_MOCK } from "../config/config";
 import type { Reaction } from "../types/models";
 import mockReactions from "../mock/reactions.json";
@@ -8,7 +7,6 @@ type Filters = {
   limit?: number;
   offset?: number;
 };
-
 
 const toQuery = (filters?: Filters) => {
   if (!filters) return "";
@@ -28,24 +26,14 @@ export async function getReactions(
   if (USE_MOCK) {
     return Promise.resolve(mockReactions as Reaction[]);
   }
-
   const qs = toQuery(filters);
   const url = `${API_BASE}/reactions${qs}`;
 
-  try {
-    const res = await fetch(url, { signal, credentials: "include" });
-    if (!res.ok) throw new Error(`status ${res.status}`);
-    const json = (await res.json()) as Reaction[];
-    return json;
-  } catch (err: any) {
-    // Если это ошибка отмены, её нужно перебросить
-    if (err?.name === "AbortError") {
-      throw err;
-    }
-
-    console.warn("api.getReactions network error, falling back to mock", err);
-    return mockReactions as Reaction[];
+  const res = await fetch(url, { signal, credentials: "include" });
+  if (!res.ok) {
+    throw new Error(`Server responded with status ${res.status}`);
   }
+  return res.json();
 }
 
 export async function getReaction(
@@ -58,23 +46,23 @@ export async function getReaction(
       null;
     return Promise.resolve(found);
   }
-
   const url = `${API_BASE}/reactions/${id}`;
-  try {
-    const res = await fetch(url, { signal, credentials: "include" });
-    if (!res.ok) throw new Error(`status ${res.status}`);
-    const json = (await res.json()) as Reaction;
-    return json;
-  } catch (err: any) {
-    // Если это ошибка отмены, её нужно перебросить
-    if (err?.name === "AbortError") {
-      throw err;
-    }
 
-    console.warn("api.getReaction network error, falling back to mock", err);
-    const found =
-      (mockReactions as Reaction[]).find((r) => String(r.id) === String(id)) ||
-      null;
-    return found;
+  const res = await fetch(url, { signal, credentials: "include" });
+  if (!res.ok) {
+    throw new Error(`Server responded with status ${res.status}`);
   }
+  return res.json();
+}
+
+export async function getCartInfo(
+  signal?: AbortSignal
+): Promise<{ id: number; reactions_count: number; cart_icon?: string }> {
+  const url = `${API_BASE}/mass-calculations/mass-calculation-cart-icon`;
+
+  const res = await fetch(url, { signal, credentials: "include" });
+  if (!res.ok) {
+    throw new Error(`Server responded with status ${res.status}`);
+  }
+  return res.json();
 }

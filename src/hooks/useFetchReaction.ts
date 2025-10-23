@@ -1,7 +1,7 @@
-// src/hooks/useFetchReaction.ts
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Reaction } from "../types/models";
 import * as api from "../api/api";
+import mockReactions from "../mock/reactions.json";
 
 export default function useFetchReaction(id?: number | string) {
   const [data, setData] = useState<Reaction | null>(null);
@@ -12,17 +12,28 @@ export default function useFetchReaction(id?: number | string) {
 
   const fetchOne = useCallback(async (ident?: number | string) => {
     if (!ident && ident !== 0) return;
+
     abortRef.current?.abort();
     const ac = new AbortController();
     abortRef.current = ac;
+
     setLoading(true);
     setError(null);
+
     try {
-      const res = await api.getReaction(ident!, ac.signal);
+      const res = await api.getReaction(ident, ac.signal);
       setData(res);
-      setLoading(false);
     } catch (err: any) {
-      setError(err?.message ?? "fetch error");
+      if (err?.name === "AbortError") {
+        return;
+      }
+      setError("Сервер недоступен. Загружены локальные данные.");
+      const foundMock =
+        (mockReactions as Reaction[]).find(
+          (r) => String(r.id) === String(ident)
+        ) || null;
+      setData(foundMock);
+    } finally {
       setLoading(false);
     }
   }, []);

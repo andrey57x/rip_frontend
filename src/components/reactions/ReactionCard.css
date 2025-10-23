@@ -1,7 +1,7 @@
 :root {
-  --card-width: 400px;
-  --card-height: 600px;
-  --card-radius: 50px;
+  --card-width: 350px;
+  --card-height: 530px;
+  --card-radius: 40px;
   --card-bg: #ffffff;
   --card-shadow: 0 8px 18px rgba(17, 51, 85, 0.06);
   --title-color: #0b2540;
@@ -9,34 +9,37 @@
 }
 
 .reaction-link {
-  text-decoration: none;
-  color: inherit;
-}
-
-.reaction-card {
   width: var(--card-width);
   height: var(--card-height);
   background: var(--card-bg);
   border-radius: var(--card-radius);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
   box-shadow: var(--card-shadow);
   overflow: hidden;
   margin-bottom: 20px;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
+  text-decoration: none;
+  color: inherit;
+  display: block;
 }
 
-.reaction-card:hover {
+.reaction-link:hover {
   transform: translateY(-6px);
   box-shadow: 0 14px 34px rgba(17, 51, 85, 0.1);
 }
 
+.reaction-card {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
 .reaction-img-wrap {
-  width: var(--card-width);
-  height: 320px;
-  flex: 0 0 320px;
+  width: 100%;
+  height: 280px;
+  flex-shrink: 0;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -46,7 +49,7 @@
 
 .reaction-img {
   width: 100%;
-  height: 320px;
+  height: 100%;
   object-fit: fill;
   display: block;
 }
@@ -90,20 +93,15 @@
 
 @media (max-width: 420px) {
   :root {
-    --card-width: 320px;
-    --card-height: 520px;
-  }
-  .reaction-card {
-    width: var(--card-width);
-    height: var(--card-height);
+    --card-width: 300px;
+    --card-height: 480px;
   }
   .reaction-img {
-    height: 260px;
+    height: 220px;
   }
   .reaction-img-wrap {
-    height: 260px;
+    height: 220px;
   }
-
   .reaction-title {
     font-size: 1.1rem;
     height: auto;

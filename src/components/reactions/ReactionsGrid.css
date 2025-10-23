@@ -7,11 +7,10 @@
 }
 
 .reactions-grid {
-  width: 90%;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   gap: 20px;
+  width: 90%;
 }
 
 .reactions-grid-empty {

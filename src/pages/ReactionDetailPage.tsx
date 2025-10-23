@@ -14,7 +14,6 @@ const ReactionDetailPage: React.FC = () => {
 
   return (
     <main className="reaction-detail-page">
-      {/* Можно передавать готовые crumbs, чтобы показать понятный путь */}
       <Breadcrumbs
         items={[
           { title: "Главная", to: "/" },
@@ -25,15 +24,6 @@ const ReactionDetailPage: React.FC = () => {
 
       <div className="detail-container">
         {loading && <div className="detail-status">Загрузка...</div>}
-
-        {/* {error && (
-          <div className="detail-status detail-error">
-            Ошибка при загрузке: {error}.{" "}
-            <button className="retry-btn" onClick={() => refetch()}>
-              Повторить
-            </button>
-          </div>
-        )} */}
 
         {!loading && !error && !reaction && (
           <div className="detail-status">Реакция не найдена.</div>

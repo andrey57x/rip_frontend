@@ -1,4 +1,4 @@
 *.sh
-project_contents.txt
+src_contents.txt
 *.key
 *.env

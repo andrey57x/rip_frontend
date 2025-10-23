@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import "./AppNavbar.css";
 
 const AppNavbar: React.FC = () => {
-  // Состояние для контроля открытия/закрытия меню
   const [isMenuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -14,7 +13,7 @@ const AppNavbar: React.FC = () => {
           <div className="brand-wrap">
             <Link to="/" className="brand-link">
               <img
-                src={`${import.meta.env.BASE_URL}img/home.png`}
+                src={`${import.meta.env.BASE_URL}/img/home.png`}
                 alt="Домой"
                 className="brand-img"
               />

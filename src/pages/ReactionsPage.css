@@ -4,6 +4,7 @@
   flex-direction: column;
   align-items: center;
   padding-bottom: 40px;
+  position: relative;
 }
 
 .reaction-cards-container {
@@ -14,16 +15,13 @@
   margin-top: 20px;
 }
 
-/* Если нужно, можно слегка изменить стиль Breadcrumbs */
-.breadcrumbs {
+.error-message {
+  background-color: #fff3cd;
+  color: #664d03;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+  text-align: center;
   width: 90%;
-  max-width: 900px;
-  margin: 12px auto;
-  padding: 8px 16px;
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(17,51,85,0.05);
-  display: flex;
-  align-items: center;
-  font-size: 1rem;
+  max-width: 920px;
 }

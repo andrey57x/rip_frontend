@@ -4,7 +4,11 @@ import { VitePWA } from "vite-plugin-pwa";
 import mkcert from "vite-plugin-mkcert";
 import fs from "fs";
 import path from "path";
-import {FRONT_HOST, FRONT_PORT, BACKEND_PATH} from "./src/config/sharedConfig";
+import {
+  FRONT_HOST,
+  FRONT_PORT,
+  ROUTER_BASENAME,
+} from "./src/config/sharedConfig";
 
 export default defineConfig({
   plugins: [
@@ -12,39 +16,23 @@ export default defineConfig({
     mkcert(),
     VitePWA({
       registerType: "autoUpdate",
-      manifest: {
-        name: "Reagent Mass Calculator",
-        short_name: "Reagent Calculator",
-        start_url: "/rip_frontend/",
-        display: "standalone",
-        background_color: "#fdfdfd",
-        theme_color: "#db4939",
-        orientation: "portrait-primary",
-        icons: [
-          {
-            src: "/rip_frontend/img/logo192.png",
-            type: "image/png",
-            sizes: "192x192",
-          },
-          {
-            src: "/rip_frontend/img/logo512.png",
-            type: "image/png",
-            sizes: "512x512",
-          },
-        ],
-      },
     }),
   ],
-  base: "/rip_frontend/",
+  base: ROUTER_BASENAME,
   server: {
     host: FRONT_HOST,
     port: FRONT_PORT,
     proxy: {
-      "/api": {
-        target: BACKEND_PATH,
+      "/api/v1": {
+        target: "http://localhost:8006",
         changeOrigin: true,
         secure: false,
-        rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+      "/minio": {
+        target: "http://localhost:8001",
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/minio/, ""),
       },
     },
     https: {

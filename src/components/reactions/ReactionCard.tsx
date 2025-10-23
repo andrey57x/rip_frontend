@@ -8,10 +8,6 @@ type Props = {
   reaction: Reaction;
 };
 
-/**
- * Карточка реакции — использует ImageWithFallback для устойчивости загрузки картинки.
- * Вся карточка — ссылка на /reactions/:id
- */
 const ReactionCard: React.FC<Props> = ({ reaction }) => {
   const imgSrc = reaction.img_link ?? undefined;
 

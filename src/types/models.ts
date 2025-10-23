@@ -1,5 +1,3 @@
-// модели TypeScript
-
 export type Reaction = {
   id: number
   title: string

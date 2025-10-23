@@ -8,21 +8,10 @@ type Crumb = {
 };
 
 type Props = {
-  /* если передать items — будет использовано оно; иначе компонент сам построит хлебные крошки из URL */
   items?: Crumb[];
-  /* отображать ли последний элемент как ссылку (по умолчанию false — текущая страница не ссылка) */
   linkLast?: boolean;
 };
 
-/**
- * Breadcrumbs
- * - если items не переданы — строит на основе useLocation().pathname
- * - автоматически аккумулирует пути ("/reactions/123" -> ["/reactions","/reactions/123"])
- *
- * Пример использования:
- *  <Breadcrumbs />                       // авто-построение
- *  <Breadcrumbs items={[{title: 'Главная', to: '/'}, {title: 'Реакции'}]} />
- */
 const Breadcrumbs: React.FC<Props> = ({ items, linkLast = false }) => {
   const location = useLocation();
 
@@ -30,15 +19,14 @@ const Breadcrumbs: React.FC<Props> = ({ items, linkLast = false }) => {
     const path = location.pathname || "/";
     if (path === "/" || path === "") return [{ title: "Главная", to: "/" }];
 
-    const parts = path.split("/").filter(Boolean); // убираем пустые сегменты
+    const parts = path.split("/").filter(Boolean);
     const crumbs: Crumb[] = [{ title: "Главная", to: "/" }];
 
     let acc = "";
     parts.forEach((p) => {
       acc += `/${p}`;
-      // преобразуем сегмент в человекочитаемое название:
       const title = /^\d+$/.test(p)
-        ? "Реакции"
+        ? "Детали"
         : decodeURIComponent(p).replace(/-/g, " ");
       crumbs.push({ title: capitalize(title), to: acc });
     });
