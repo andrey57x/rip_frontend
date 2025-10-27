@@ -1,19 +1,39 @@
 import React from "react";
 import { useParams, Link } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import type { AppDispatch } from "../store/store";
+import { selectIsAuthenticated } from "../slices/authSlice";
+import {
+  addToDraft,
+  selectLoadingReactionId,
+} from "../slices/calculationSlice";
 import ImageWithFallback from "../components/ui/ImageWithFallback";
 import useFetchReaction from "../hooks/useFetchReaction";
 import Breadcrumbs from "../components/layout/Breadcrumbs";
-import type { Reaction } from "../types/models";
+import DraftIcon from "../components/draft/DraftIcon";
 import "./ReactionDetailPage.css";
 
 const ReactionDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { data, loading, error } = useFetchReaction(id);
+  const dispatch: AppDispatch = useDispatch();
 
-  const reaction = data as Reaction | null;
+  const { data: reaction, loading, error } = useFetchReaction(id);
+
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const loadingReactionId = useSelector(selectLoadingReactionId);
+
+  const reactionId = reaction ? reaction.id : null;
+  const isLoadingThisReaction = loadingReactionId === reactionId;
+
+  const handleAddToCart = () => {
+    if (reactionId && !isLoadingThisReaction) {
+      dispatch(addToDraft(reactionId));
+    }
+  };
 
   return (
     <main className="reaction-detail-page">
+      <DraftIcon />
       <Breadcrumbs
         items={[
           { title: "Главная", to: "/" },
@@ -25,6 +45,8 @@ const ReactionDetailPage: React.FC = () => {
       <div className="detail-container">
         {loading && <div className="detail-status">Загрузка...</div>}
 
+        {error && <div className="detail-status detail-error">{error}</div>}
+
         {!loading && !error && !reaction && (
           <div className="detail-status">Реакция не найдена.</div>
         )}
@@ -33,11 +55,9 @@ const ReactionDetailPage: React.FC = () => {
           <article className="detail-card">
             <div className="detail-header">
               <h1 className="detail-title">{reaction.title}</h1>
-              <div className="detail-meta">
-                <Link to="/reactions" className="back-link">
-                  ← Назад к списку
-                </Link>
-              </div>
+              <Link to="/reactions" className="back-link">
+                ← Назад к списку
+              </Link>
             </div>
 
             <div className="detail-content">
@@ -74,6 +94,20 @@ const ReactionDetailPage: React.FC = () => {
 
                 <h3 className="desc-title">Описание процесса</h3>
                 <p className="desc-text">{reaction.description ?? "-"}</p>
+
+                {isAuthenticated && (
+                  <div className="detail-actions">
+                    <button
+                      className="add-to-cart-btn-detail"
+                      onClick={handleAddToCart}
+                      disabled={isLoadingThisReaction}
+                    >
+                      {isLoadingThisReaction
+                        ? "Добавление..."
+                        : "В расчет массы"}
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </article>

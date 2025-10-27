@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { RootState } from "../store/store";
+import { logoutUser } from "./authSlice"; // 1. Импортируем действие выхода
 
 interface FilterState {
   searchTerm: string;
@@ -17,10 +17,16 @@ const filterSlice = createSlice({
       state.searchTerm = action.payload;
     },
   },
+  extraReducers: (builder) => {
+    builder.addCase(logoutUser.fulfilled, (state) => {
+      state.searchTerm = "";
+    });
+  },
 });
 
 export const { setSearchTerm } = filterSlice.actions;
 
-export const selectSearchTerm = (state: RootState) => state.filter.searchTerm;
+export const selectSearchTerm = (state: { filter: FilterState }) =>
+  state.filter.searchTerm;
 
 export default filterSlice.reducer;

@@ -1,22 +1,13 @@
-import { API_BASE, USE_MOCK } from "../config/config";
+import axios from "axios";
+import { USE_MOCK } from "../config/config";
 import type { Reaction } from "../types/models";
 import mockReactions from "../mock/reactions.json";
+import axiosInstance from "./axiosInstance";
 
 type Filters = {
   reaction_title?: string;
   limit?: number;
   offset?: number;
-};
-
-const toQuery = (filters?: Filters) => {
-  if (!filters) return "";
-  const params = new URLSearchParams();
-  Object.entries(filters).forEach(([k, v]) => {
-    if (v === undefined || v === null || v === "") return;
-    params.append(k, String(v));
-  });
-  const s = params.toString();
-  return s ? `?${s}` : "";
 };
 
 export async function getReactions(
@@ -26,14 +17,20 @@ export async function getReactions(
   if (USE_MOCK) {
     return Promise.resolve(mockReactions as Reaction[]);
   }
-  const qs = toQuery(filters);
-  const url = `${API_BASE}/reactions${qs}`;
 
-  const res = await fetch(url, { signal, credentials: "include" });
-  if (!res.ok) {
-    throw new Error(`Server responded with status ${res.status}`);
+  try {
+    const response = await axiosInstance.get<Reaction[]>("/reactions", {
+      params: filters,
+      signal: signal,
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isCancel(error)) {
+      console.log("Request canceled:", error.message);
+      return [];
+    }
+    throw new Error("Server responded with an error");
   }
-  return res.json();
 }
 
 export async function getReaction(
@@ -46,23 +43,159 @@ export async function getReaction(
       null;
     return Promise.resolve(found);
   }
-  const url = `${API_BASE}/reactions/${id}`;
 
-  const res = await fetch(url, { signal, credentials: "include" });
-  if (!res.ok) {
-    throw new Error(`Server responded with status ${res.status}`);
+  try {
+    const response = await axiosInstance.get<Reaction>(`/reactions/${id}`, {
+      signal,
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isCancel(error)) {
+      console.log("Request canceled:", error.message);
+      return null;
+    }
+    throw new Error("Server responded with an error");
   }
-  return res.json();
 }
 
 export async function getCartInfo(
   signal?: AbortSignal
 ): Promise<{ id: number; reactions_count: number; cart_icon?: string }> {
-  const url = `${API_BASE}/mass-calculations/mass-calculation-cart-icon`;
-
-  const res = await fetch(url, { signal, credentials: "include" });
-  if (!res.ok) {
-    throw new Error(`Server responded with status ${res.status}`);
+  try {
+    const response = await axiosInstance.get<{
+      id: number;
+      reactions_count: number;
+      cart_icon?: string;
+    }>("/mass-calculations/mass-calculation-cart-icon", { signal });
+    return response.data;
+  } catch (error) {
+    if (axios.isCancel(error)) {
+      console.log("Request canceled:", error.message);
+      return { id: -1, reactions_count: 0 };
+    }
+    throw new Error("Server responded with an error");
   }
-  return res.json();
+}
+
+export interface UserCredentials {
+  login: string;
+  password?: string;
+}
+
+interface AuthResponse {
+  token: string;
+}
+
+export async function login(
+  credentials: UserCredentials
+): Promise<AuthResponse> {
+  const response = await axiosInstance.post<AuthResponse>(
+    "/users/sign-in",
+    credentials
+  );
+  return response.data;
+}
+
+export async function register(credentials: UserCredentials): Promise<void> {
+  await axiosInstance.post("/users/sign-up", credentials);
+}
+
+export async function logout(): Promise<void> {
+  await axiosInstance.post("/users/sign-out");
+}
+
+interface ReactionWithOutput {
+  reaction: Reaction;
+  output_mass: number;
+  input_mass: number;
+}
+
+export interface MassCalculationDetails {
+  calculation: {
+    id: number;
+    status: string;
+    date_create: string;
+  };
+  reactions: ReactionWithOutput[];
+}
+
+export interface MassCalculationInList {
+  id: number;
+  status: string;
+  date_create: string;
+  creator_login: string;
+}
+
+export async function addReactionToDraft(reactionId: number): Promise<void> {
+  await axiosInstance.post(`/reactions/${reactionId}/add-to-calculation`);
+}
+
+export async function fetchCalculationById(
+  calculationId: number
+): Promise<MassCalculationDetails> {
+  const response = await axiosInstance.get<MassCalculationDetails>(
+    `/mass-calculations/${calculationId}`
+  );
+  return response.data;
+}
+
+export async function fetchCalculationsHistory(): Promise<
+  MassCalculationInList[]
+> {
+  const response = await axiosInstance.get<MassCalculationInList[]>(
+    "/mass-calculations"
+  );
+  return response.data;
+}
+
+export async function removeReactionFromDraft(
+  calculationId: number,
+  reactionId: number
+): Promise<void> {
+  await axiosInstance.delete(
+    `/reaction-calculations/${calculationId}/${reactionId}`
+  );
+}
+
+export async function confirmDraft(calculationId: number): Promise<void> {
+  await axiosInstance.put(`/mass-calculations/${calculationId}/form`);
+}
+
+export interface UpdateMassPayload {
+  calculationId: number;
+  reactionId: number;
+  output_mass: number;
+}
+
+export async function updateReactionMass(
+  payload: UpdateMassPayload
+): Promise<void> {
+  await axiosInstance.put(
+    `/reaction-calculations/${payload.calculationId}/${payload.reactionId}`,
+    { output_mass: payload.output_mass }
+  );
+}
+
+export interface UpdateProfilePayload {
+  id: string;
+  data: {
+    login?: string;
+    password?: string;
+  };
+}
+
+export async function updateProfile(
+  payload: UpdateProfilePayload
+): Promise<void> {
+  await axiosInstance.put(`/users/${payload.id}/profile`, payload.data);
+}
+
+export interface UserProfile {
+  login: string;
+  isModerator: boolean;
+}
+
+export async function getProfile(id: string): Promise<UserProfile> {
+  const response = await axiosInstance.get(`/users/${id}/profile`);
+  return response.data;
 }

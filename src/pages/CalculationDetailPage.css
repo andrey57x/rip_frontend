@@ -1,0 +1,99 @@
+.calculation-detail-page {
+  width: 90%;
+  max-width: 1200px;
+  margin: 20px auto 40px;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+.calculation-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--filter-border);
+  padding-bottom: 1rem;
+}
+
+.calculation-detail-title {
+  font-size: 2.2rem;
+  color: #0b2540;
+  margin: 0;
+}
+
+.draft-empty-message, .loading-spinner {
+  text-align: center;
+  font-size: 1.2rem;
+  color: var(--muted);
+  padding: 3rem 1rem;
+  background-color: #fff;
+  border-radius: 18px;
+  box-shadow: 0 6px 18px rgba(17,51,85,0.06);
+}
+
+.draft-item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.draft-actions {
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--filter-border);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.confirm-draft-btn {
+  padding: 12px 24px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: white;
+  background-color: #28a745;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.confirm-draft-btn:hover {
+  background-color: #218838;
+}
+.confirm-draft-btn:disabled {
+  background-color: #a3d9b1;
+  cursor: not-allowed;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.35em 0.8em;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.75rem;
+}
+
+.status-draft {
+    color: #586079;
+    background-color: #e9ecef;
+}
+
+.status-formed {
+    color: #004085;
+    background-color: #cce5ff;
+}
+
+.status-completed {
+    color: #155724;
+    background-color: #d4edda;
+}
+
+.status-rejected {
+    color: #721c24;
+    background-color: #f8d7da;
+}

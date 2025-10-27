@@ -1,0 +1,122 @@
+.draft-item {
+    display: grid;
+    grid-template-columns: 200px 1fr auto;
+    gap: 2rem;
+    align-items: center;
+    padding: 1.5rem;
+    background: #ffffff;
+    border-radius: 24px;
+    border: 1px solid var(--filter-border);
+    box-shadow: 0 8px 24px rgba(17, 51, 85, 0.07);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+  
+  .draft-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 14px 28px rgba(17, 51, 85, 0.1);
+  }
+  
+  .draft-item-link-area {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+  }
+  
+  .draft-item-link-area:hover .draft-item-title {
+      color: var(--accent-dark);
+  }
+  
+  .draft-item-img-wrap {
+      width: 200px;
+      height: 150px;
+      border-radius: 16px;
+      overflow: hidden;
+      background-color: #f8fbfd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+  }
+  
+  .draft-item-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  
+  .draft-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .draft-item-title {
+    font-weight: 600;
+    font-size: 1.5rem;
+    margin: 0;
+    color: #0b2540;
+    transition: color 0.2s ease;
+  }
+  
+  .draft-item-details {
+    font-size: 1.1rem;
+    color: var(--muted);
+    margin: 0;
+  }
+  
+  .draft-item-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding-left: 1rem;
+  }
+  
+  .mass-input-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+  }
+  
+  .mass-input-label {
+      font-size: 1.1rem;
+      color: var(--muted-2);
+  }
+  
+  .mass-input {
+      width: 110px;
+      padding: 10px 12px;
+      font-size: 1.1rem;
+      border: 1px solid #cddde8;
+      border-radius: 10px;
+      text-align: right;
+  }
+  .mass-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(83, 137, 174, 0.2);
+  }
+  
+  .draft-item-remove-btn {
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--danger);
+    background-color: transparent;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .draft-item-remove-btn:hover {
+    background-color: #fbeae9;
+    border-color: #f5c6cb;
+    color: #721c24;
+  }
+  
+  .calculated-mass {
+      font-size: 1.1rem !important;
+      color: #155724 !important;
+      margin-top: 0.5rem !important;
+  }

@@ -1,4 +1,4 @@
-const HOST = "10.191.166.133";
+const HOST = "localhost";
 
 export const LOCAL_BACKEND_URL = `http://${HOST}:8006`;
 export const LOCAL_MINIO_URL = `http://${HOST}:8001`;
