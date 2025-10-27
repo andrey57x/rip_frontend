@@ -31,12 +31,12 @@ export default defineConfig({
         orientation: "portrait-primary",
         icons: [
           {
-            src: `${ROUTER_BASENAME}/img/logo192.png`,
+            src: "img/logo192.png",
             type: "image/png",
             sizes: "192x192",
           },
           {
-            src: `${ROUTER_BASENAME}/img/logo512.png`,
+            src: "img/logo512.png",
             type: "image/png",
             sizes: "512x512",
           },
