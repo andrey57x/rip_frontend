@@ -9,7 +9,10 @@ import {
   fetchCalculationDetails,
   confirmCalculation,
   clearCurrentCalculation,
+  moderate,
+  deleteDraft,
 } from "../slices/calculationSlice";
+import { selectUser } from "../slices/authSlice";
 import Breadcrumbs from "../components/layout/Breadcrumbs";
 import DraftReactionItem from "../components/draft/DraftReactionItem";
 import "./CalculationDetailPage.css";
@@ -19,6 +22,7 @@ const CalculationDetailPage: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
 
+  const user = useSelector(selectUser);
   const draftInfo = useSelector(selectDraftInfo);
   const calculation = useSelector(selectCurrentCalculation);
   const status = useSelector(selectCalculationsStatus);
@@ -35,12 +39,45 @@ const CalculationDetailPage: React.FC = () => {
     };
   }, [calculationId, dispatch]);
 
+  useEffect(() => {
+    if (
+      calculation?.calculation.status === "completed" &&
+      calculation.completed_reactions_count < calculation.total_reactions_count
+    ) {
+      const intervalId = setInterval(() => {
+        if (calculationId) {
+          dispatch(fetchCalculationDetails(calculationId));
+        }
+      }, 3000);
+
+      return () => clearInterval(intervalId);
+    }
+  }, [calculation, calculationId, dispatch]);
+
   const handleConfirm = async () => {
     if (draftInfo.id) {
       const result = await dispatch(confirmCalculation(draftInfo.id));
       if (confirmCalculation.fulfilled.match(result)) {
         navigate("/calculations");
       }
+    }
+  };
+
+  const handleDelete = async () => {
+    if (
+      draftInfo.id &&
+      window.confirm("Вы уверены, что хотите удалить этот черновик?")
+    ) {
+      const result = await dispatch(deleteDraft(draftInfo.id));
+      if (deleteDraft.fulfilled.match(result)) {
+        navigate("/reactions");
+      }
+    }
+  };
+
+  const handleModerate = (newStatus: "completed" | "rejected") => {
+    if (calculationId) {
+      dispatch(moderate({ id: calculationId, status: newStatus }));
     }
   };
 
@@ -82,15 +119,40 @@ const CalculationDetailPage: React.FC = () => {
         <div className="calculation-detail-header">
           <h1 className="calculation-detail-title">{breadcrumbTitle}</h1>
           {calculation && (
-            <span
-              className={`status-badge ${getStatusClass(
-                calculation.calculation.status
-              )}`}
-            >
-              {calculation.calculation.status}
-            </span>
+            <div className="header-meta">
+              {calculation.calculation.status === "completed" && (
+                <span className="progress-indicator">
+                  Прогресс: {calculation.completed_reactions_count} /{" "}
+                  {calculation.total_reactions_count}
+                </span>
+              )}
+              <span
+                className={`status-badge ${getStatusClass(
+                  calculation.calculation.status
+                )}`}
+              >
+                {calculation.calculation.status}
+              </span>
+            </div>
           )}
         </div>
+
+        {user?.isModerator && calculation?.calculation.status === "formed" && (
+          <div className="moderation-panel">
+            <button
+              onClick={() => handleModerate("completed")}
+              className="btn-approve"
+            >
+              Одобрить
+            </button>
+            <button
+              onClick={() => handleModerate("rejected")}
+              className="btn-reject"
+            >
+              Отклонить
+            </button>
+          </div>
+        )}
 
         {isLoading ? (
           <div className="loading-spinner">Загрузка...</div>
@@ -119,6 +181,13 @@ const CalculationDetailPage: React.FC = () => {
                   {status === "loading"
                     ? "Обработка..."
                     : "Сформировать заявку"}
+                </button>
+                <button
+                  className="delete-draft-btn"
+                  onClick={handleDelete}
+                  disabled={status === "loading"}
+                >
+                  Удалить черновик
                 </button>
               </div>
             )}

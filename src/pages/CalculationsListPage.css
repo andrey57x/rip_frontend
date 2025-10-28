@@ -16,6 +16,23 @@
     margin: 0;
 }
 
+.filters-container {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(17,51,85,0.06);
+}
+
+.filters-container input, .filters-container select {
+    padding: 8px 12px;
+    border: 1px solid #cddde8;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
 .calc-history-table {
     width: 100%;
     border-collapse: collapse;
@@ -29,6 +46,7 @@
     padding: 1rem 1.5rem;
     text-align: left;
     border-bottom: 1px solid var(--filter-border);
+    vertical-align: middle;
 }
 
 .calc-history-table thead {
@@ -96,4 +114,31 @@
 .details-link:hover {
     text-decoration: underline;
     color: var(--accent-dark);
+}
+
+.moderation-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.moderation-buttons button {
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.moderation-buttons button:hover {
+    opacity: 0.8;
+}
+
+.btn-approve {
+    background-color: #28a745;
+}
+
+.btn-reject {
+    background-color: #dc3545;
 }

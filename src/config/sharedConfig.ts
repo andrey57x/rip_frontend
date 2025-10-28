@@ -6,7 +6,7 @@ export const LOCAL_MINIO_URL = `http://${HOST}:8001`;
 export const API_BASE = "/api/v1";
 export const MINIO_PATH = "/minio";
 
-export const FRONT_HOST = "localhost";
+export const FRONT_HOST = "0.0.0.0";
 export const FRONT_PORT = 3000;
 
 export const ROUTER_BASENAME = "/rip_frontend";

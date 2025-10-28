@@ -12,6 +12,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
   margin-bottom: 2rem;
   border-bottom: 1px solid var(--filter-border);
   padding-bottom: 1rem;
@@ -22,6 +24,53 @@
   color: #0b2540;
   margin: 0;
 }
+
+.header-meta {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.progress-indicator {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--muted-2);
+}
+
+.moderation-panel {
+    background-color: #fff;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    box-shadow: 0 6px 18px rgba(17,51,85,0.06);
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+.moderation-panel button {
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.moderation-panel button:hover {
+    opacity: 0.85;
+}
+
+.btn-approve {
+    background-color: #28a745;
+}
+
+.btn-reject {
+    background-color: #dc3545;
+}
+
 
 .draft-empty-message, .loading-spinner {
   text-align: center;
@@ -42,9 +91,11 @@
 .draft-actions {
   margin-top: 2.5rem;
   padding-top: 1.5rem;
+  gap: 1rem;
   border-top: 1px solid var(--filter-border);
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .confirm-draft-btn {
@@ -64,6 +115,22 @@
 .confirm-draft-btn:disabled {
   background-color: #a3d9b1;
   cursor: not-allowed;
+}
+
+.delete-draft-btn {
+  padding: 12px 24px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #721c24;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.delete-draft-btn:hover {
+    background-color: #f1b0b7;
+    border-color: #ee9ca7;
 }
 
 .status-badge {
