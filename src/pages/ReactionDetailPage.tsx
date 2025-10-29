@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import type { AppDispatch } from "../store/store";
@@ -6,6 +6,9 @@ import { selectIsAuthenticated } from "../slices/authSlice";
 import {
   addToDraft,
   selectLoadingReactionId,
+  selectDraftReactionIds,
+  selectDraftInfo,
+  fetchDraftReactionIds,
 } from "../slices/calculationSlice";
 import ImageWithFallback from "../components/ui/ImageWithFallback";
 import useFetchReaction from "../hooks/useFetchReaction";
@@ -21,12 +24,24 @@ const ReactionDetailPage: React.FC = () => {
 
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const loadingReactionId = useSelector(selectLoadingReactionId);
+  const draftInfo = useSelector(selectDraftInfo);
+  const draftReactionIds = useSelector(selectDraftReactionIds);
+
+  useEffect(() => {
+    if (isAuthenticated && draftInfo.id) {
+      dispatch(fetchDraftReactionIds(draftInfo.id));
+    }
+  }, [isAuthenticated, draftInfo.id, dispatch]);
 
   const reactionId = reaction ? reaction.id : null;
   const isLoadingThisReaction = loadingReactionId === reactionId;
+  const isInCart = useMemo(
+    () => (reactionId ? draftReactionIds.includes(reactionId) : false),
+    [draftReactionIds, reactionId]
+  );
 
   const handleAddToCart = () => {
-    if (reactionId && !isLoadingThisReaction) {
+    if (reactionId && !isLoadingThisReaction && !isInCart) {
       dispatch(addToDraft(reactionId));
     }
   };
@@ -98,12 +113,16 @@ const ReactionDetailPage: React.FC = () => {
                 {isAuthenticated && (
                   <div className="detail-actions">
                     <button
-                      className="add-to-cart-btn-detail"
+                      className={`add-to-cart-btn-detail ${
+                        isInCart ? "in-cart" : ""
+                      }`}
                       onClick={handleAddToCart}
-                      disabled={isLoadingThisReaction}
+                      disabled={isLoadingThisReaction || isInCart}
                     >
                       {isLoadingThisReaction
                         ? "Добавление..."
+                        : isInCart
+                        ? "В расчете"
                         : "В расчет массы"}
                     </button>
                   </div>

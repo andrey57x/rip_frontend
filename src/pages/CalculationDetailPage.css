@@ -91,10 +91,10 @@
 .draft-actions {
   margin-top: 2.5rem;
   padding-top: 1.5rem;
-  gap: 1rem;
   border-top: 1px solid var(--filter-border);
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
+  gap: 1rem;
   align-items: center;
 }
 
@@ -131,6 +131,16 @@
 .delete-draft-btn:hover {
     background-color: #f1b0b7;
     border-color: #ee9ca7;
+}
+
+.delete-draft-btn.confirm {
+    background-color: #dc3545;
+    color: white;
+    border-color: #c82333;
+}
+
+.delete-draft-btn.confirm:hover {
+    background-color: #c82333;
 }
 
 .status-badge {

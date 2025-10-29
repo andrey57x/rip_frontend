@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import type { AppDispatch } from "../store/store";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -27,6 +27,8 @@ const CalculationDetailPage: React.FC = () => {
   const calculation = useSelector(selectCurrentCalculation);
   const status = useSelector(selectCalculationsStatus);
 
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+
   const calculationId = id ? parseInt(id, 10) : draftInfo.id;
   const isDraft = !id && calculation?.calculation.status === "draft";
 
@@ -54,6 +56,14 @@ const CalculationDetailPage: React.FC = () => {
     }
   }, [calculation, calculationId, dispatch]);
 
+  useEffect(() => {
+    let timer: number;
+    if (isConfirmingDelete) {
+      timer = window.setTimeout(() => setIsConfirmingDelete(false), 4000);
+    }
+    return () => clearTimeout(timer);
+  }, [isConfirmingDelete]);
+
   const handleConfirm = async () => {
     if (draftInfo.id) {
       const result = await dispatch(confirmCalculation(draftInfo.id));
@@ -63,15 +73,16 @@ const CalculationDetailPage: React.FC = () => {
     }
   };
 
-  const handleDelete = async () => {
-    if (
-      draftInfo.id &&
-      window.confirm("Вы уверены, что хотите удалить этот черновик?")
-    ) {
-      const result = await dispatch(deleteDraft(draftInfo.id));
-      if (deleteDraft.fulfilled.match(result)) {
-        navigate("/reactions");
+  const handleDeleteClick = async () => {
+    if (isConfirmingDelete) {
+      if (draftInfo.id) {
+        const result = await dispatch(deleteDraft(draftInfo.id));
+        if (deleteDraft.fulfilled.match(result)) {
+          navigate("/reactions");
+        }
       }
+    } else {
+      setIsConfirmingDelete(true);
     }
   };
 
@@ -176,18 +187,22 @@ const CalculationDetailPage: React.FC = () => {
                 <button
                   className="confirm-draft-btn"
                   onClick={handleConfirm}
-                  disabled={status === "loading"}
+                  disabled={status === "loading" || isConfirmingDelete}
                 >
                   {status === "loading"
                     ? "Обработка..."
                     : "Сформировать заявку"}
                 </button>
                 <button
-                  className="delete-draft-btn"
-                  onClick={handleDelete}
+                  className={`delete-draft-btn ${
+                    isConfirmingDelete ? "confirm" : ""
+                  }`}
+                  onClick={handleDeleteClick}
                   disabled={status === "loading"}
                 >
-                  Удалить черновик
+                  {isConfirmingDelete
+                    ? "Подтвердить удаление"
+                    : "Удалить черновик"}
                 </button>
               </div>
             )}

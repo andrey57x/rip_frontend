@@ -7,7 +7,12 @@ import ReactionsGrid from "../components/reactions/ReactionsGrid";
 import useFetchReactions from "../hooks/useFetchReactions";
 import { selectSearchTerm, setSearchTerm } from "../slices/filterSlice";
 import { selectIsAuthenticated } from "../slices/authSlice";
-import { fetchDraftInfo, selectCalculationsError, selectCalculationsStatus } from "../slices/calculationSlice";
+import {
+  fetchDraftInfo,
+  fetchDraftReactionIds,
+  selectCalculationsError,
+  selectCalculationsStatus,
+} from "../slices/calculationSlice";
 import DraftIcon from "../components/draft/DraftIcon";
 import "./ReactionsPage.css";
 
@@ -35,9 +40,18 @@ const ReactionsPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      dispatch(fetchDraftInfo());
-    }
+    const fetchInitialData = async () => {
+      if (isAuthenticated) {
+        const resultAction = await dispatch(fetchDraftInfo());
+        if (fetchDraftInfo.fulfilled.match(resultAction)) {
+          const id = resultAction.payload.id;
+          if (id) {
+            dispatch(fetchDraftReactionIds(id));
+          }
+        }
+      }
+    };
+    fetchInitialData();
   }, [isAuthenticated, dispatch]);
 
   const handleSearch = () => {
@@ -47,7 +61,6 @@ const ReactionsPage: React.FC = () => {
   const handleFilterChange = (newValue: string) => {
     dispatch(setSearchTerm(newValue));
   };
-  
 
   return (
     <main className="reactions-page">

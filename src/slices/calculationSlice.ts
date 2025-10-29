@@ -11,6 +11,7 @@ interface CartInfo {
 
 interface CalculationState {
   draftInfo: CartInfo;
+  draftReactionIds: number[];
   cartStatus: "idle" | "loading" | "succeeded" | "failed";
   currentCalculation: api.MassCalculationDetails | null;
   history: api.MassCalculationInList[];
@@ -21,6 +22,7 @@ interface CalculationState {
 
 const initialState: CalculationState = {
   draftInfo: { id: null, reactions_count: 0 },
+  draftReactionIds: [],
   cartStatus: "idle",
   currentCalculation: null,
   history: [],
@@ -41,15 +43,32 @@ export const fetchDraftInfo = createAsyncThunk(
   }
 );
 
+export const fetchDraftReactionIds = createAsyncThunk(
+  "calculations/fetchDraftReactionIds",
+  async (draftId: number, { rejectWithValue }) => {
+    try {
+      const details = await api.fetchCalculationById(draftId);
+      return details.reactions.map((item) => item.reaction.id);
+    } catch (error) {
+      return rejectWithValue("Failed to fetch draft items");
+    }
+  }
+);
+
 export const addToDraft = createAsyncThunk(
   "calculations/addToDraft",
-  async (reactionId: number, { rejectWithValue }) => {
+  async (reactionId: number, { dispatch, rejectWithValue }) => {
     try {
       await api.addReactionToDraft(reactionId);
       const data = await api.getCartInfo();
+      if (data.id && data.id !== -1) {
+        dispatch(fetchDraftReactionIds(data.id));
+      }
       return data.id === -1 ? { ...data, id: null } : data;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.description || "Не удалось добавить в расчет");
+      return rejectWithValue(
+        error.response?.data?.description || "Не удалось добавить в расчет"
+      );
     }
   }
 );
@@ -79,51 +98,64 @@ export const fetchHistory = createAsyncThunk(
 );
 
 export const moderate = createAsyncThunk(
-    "calculations/moderate",
-    async (params: { id: number; status: 'completed' | 'rejected' }, { rejectWithValue }) => {
-        try {
-            const updatedCalculation = await api.moderateCalculation(params.id, params.status);
-            return updatedCalculation;
-        } catch (error: any) {
-            return rejectWithValue("Moderation failed");
-        }
+  "calculations/moderate",
+  async (
+    params: { id: number; status: "completed" | "rejected" },
+    { rejectWithValue }
+  ) => {
+    try {
+      const updatedCalculation = await api.moderateCalculation(
+        params.id,
+        params.status
+      );
+      return updatedCalculation;
+    } catch (error: any) {
+      return rejectWithValue("Moderation failed");
     }
+  }
 );
 
 export const deleteDraft = createAsyncThunk(
-    "calculations/deleteDraft",
-    async (id: number, { rejectWithValue }) => {
-        try {
-            await api.deleteCalculation(id);
-        } catch (error: any) {
-            return rejectWithValue("Failed to delete draft");
-        }
+  "calculations/deleteDraft",
+  async (id: number, { rejectWithValue }) => {
+    try {
+      await api.deleteCalculation(id);
+    } catch (error: any) {
+      return rejectWithValue("Failed to delete draft");
     }
+  }
 );
 
 export const removeFromDraft = createAsyncThunk(
-    "calculations/removeFromDraft",
-    async (params: {calculationId: number, reactionId: number}, { dispatch, rejectWithValue }) => {
-        try {
-            await api.removeReactionFromDraft(params.calculationId, params.reactionId);
-            dispatch(fetchDraftInfo());
-            dispatch(fetchCalculationDetails(params.calculationId));
-        } catch (error: any) {
-            return rejectWithValue("Failed to remove item from draft");
-        }
+  "calculations/removeFromDraft",
+  async (
+    params: { calculationId: number; reactionId: number },
+    { dispatch, rejectWithValue }
+  ) => {
+    try {
+      await api.removeReactionFromDraft(
+        params.calculationId,
+        params.reactionId
+      );
+      dispatch(fetchDraftInfo());
+      dispatch(fetchCalculationDetails(params.calculationId));
+      dispatch(fetchDraftReactionIds(params.calculationId));
+    } catch (error: any) {
+      return rejectWithValue("Failed to remove item from draft");
     }
+  }
 );
 
 export const confirmCalculation = createAsyncThunk(
-    "calculations/confirmCalculation",
-    async (calculationId: number, { dispatch, rejectWithValue }) => {
-        try {
-            await api.confirmDraft(calculationId);
-            dispatch(fetchDraftInfo());
-        } catch (error: any) {
-            return rejectWithValue("Failed to confirm calculation");
-        }
+  "calculations/confirmCalculation",
+  async (calculationId: number, { dispatch, rejectWithValue }) => {
+    try {
+      await api.confirmDraft(calculationId);
+      dispatch(fetchDraftInfo());
+    } catch (error: any) {
+      return rejectWithValue("Failed to confirm calculation");
     }
+  }
 );
 
 export const updateMass = createAsyncThunk(
@@ -143,29 +175,41 @@ const calculationSlice = createSlice({
   initialState,
   reducers: {
     clearCurrentCalculation: (state) => {
-        state.currentCalculation = null;
-    }
+      state.currentCalculation = null;
+    },
   },
   extraReducers: (builder) => {
     builder
       .addCase(fetchDraftInfo.pending, (state) => {
         state.cartStatus = "loading";
       })
-      .addCase(fetchDraftInfo.fulfilled, (state, action: PayloadAction<CartInfo>) => {
-        state.cartStatus = "succeeded";
-        state.draftInfo = action.payload;
-      })
+      .addCase(
+        fetchDraftInfo.fulfilled,
+        (state, action: PayloadAction<CartInfo>) => {
+          state.cartStatus = "succeeded";
+          state.draftInfo = action.payload;
+        }
+      )
       .addCase(fetchDraftInfo.rejected, (state) => {
         state.cartStatus = "failed";
       })
+      .addCase(
+        fetchDraftReactionIds.fulfilled,
+        (state, action: PayloadAction<number[]>) => {
+          state.draftReactionIds = action.payload;
+        }
+      )
       .addCase(addToDraft.pending, (state, action) => {
         state.loadingReactionId = action.meta.arg;
         state.error = null;
       })
-      .addCase(addToDraft.fulfilled, (state, action: PayloadAction<CartInfo>) => {
-        state.draftInfo = action.payload;
-        state.loadingReactionId = null;
-      })
+      .addCase(
+        addToDraft.fulfilled,
+        (state, action: PayloadAction<CartInfo>) => {
+          state.draftInfo = action.payload;
+          state.loadingReactionId = null;
+        }
+      )
       .addCase(addToDraft.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload as string;
@@ -174,10 +218,13 @@ const calculationSlice = createSlice({
       .addCase(fetchCalculationDetails.pending, (state) => {
         state.status = "loading";
       })
-      .addCase(fetchCalculationDetails.fulfilled, (state, action: PayloadAction<api.MassCalculationDetails>) => {
-        state.status = "succeeded";
-        state.currentCalculation = action.payload;
-      })
+      .addCase(
+        fetchCalculationDetails.fulfilled,
+        (state, action: PayloadAction<api.MassCalculationDetails>) => {
+          state.status = "succeeded";
+          state.currentCalculation = action.payload;
+        }
+      )
       .addCase(fetchCalculationDetails.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload as string;
@@ -185,56 +232,69 @@ const calculationSlice = createSlice({
       .addCase(fetchHistory.pending, (state) => {
         state.status = "loading";
       })
-      .addCase(fetchHistory.fulfilled, (state, action: PayloadAction<api.MassCalculationInList[]>) => {
-        state.status = "succeeded";
-        state.history = action.payload;
-      })
+      .addCase(
+        fetchHistory.fulfilled,
+        (state, action: PayloadAction<api.MassCalculationInList[]>) => {
+          state.status = "succeeded";
+          state.history = action.payload;
+        }
+      )
       .addCase(fetchHistory.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload as string;
       })
       .addCase(moderate.pending, (state) => {
-          state.status = 'loading';
+        state.status = "loading";
       })
-      .addCase(moderate.fulfilled, (state, action: PayloadAction<api.MassCalculationInList>) => {
-          state.status = 'succeeded';
+      .addCase(
+        moderate.fulfilled,
+        (state, action: PayloadAction<api.MassCalculationInList>) => {
+          state.status = "succeeded";
           if (state.currentCalculation) {
-              state.currentCalculation.calculation.status = action.payload.status;
+            state.currentCalculation.calculation.status = action.payload.status;
           }
-      })
+        }
+      )
       .addCase(moderate.rejected, (state) => {
-          state.status = 'failed';
+        state.status = "failed";
       })
       .addCase(deleteDraft.pending, (state) => {
-          state.status = 'loading';
+        state.status = "loading";
       })
       .addCase(deleteDraft.fulfilled, (state) => {
-          state.status = 'succeeded';
-          state.currentCalculation = null;
-          state.draftInfo = { id: null, reactions_count: 0 };
+        state.status = "succeeded";
+        state.currentCalculation = null;
+        state.draftInfo = { id: null, reactions_count: 0 };
+        state.draftReactionIds = [];
       })
       .addCase(deleteDraft.rejected, (state) => {
-          state.status = 'failed';
+        state.status = "failed";
       })
-      .addCase(updateMass.fulfilled, (state, action: PayloadAction<api.UpdateMassPayload>) => {
-            if (state.currentCalculation) {
-                const { reactionId, output_mass } = action.payload;
-                const reactionIndex = state.currentCalculation.reactions.findIndex(
-                    (r) => r.reaction.id === reactionId
-                );
-                if (reactionIndex !== -1) {
-                    state.currentCalculation.reactions[reactionIndex].output_mass = output_mass;
-                }
+      .addCase(
+        updateMass.fulfilled,
+        (state, action: PayloadAction<api.UpdateMassPayload>) => {
+          if (state.currentCalculation) {
+            const { reactionId, output_mass } = action.payload;
+            const reactionIndex = state.currentCalculation.reactions.findIndex(
+              (r) => r.reaction.id === reactionId
+            );
+            if (reactionIndex !== -1) {
+              state.currentCalculation.reactions[reactionIndex].output_mass =
+                output_mass;
             }
-      })
+          }
+        }
+      )
       .addCase(confirmCalculation.fulfilled, (state) => {
         state.currentCalculation = null;
+        state.draftReactionIds = [];
       })
       .addCase(logoutUser.fulfilled, (state) => {
         state.draftInfo = { id: null, reactions_count: 0 };
         state.cartStatus = "idle";
         state.currentCalculation = null;
         state.history = [];
+        state.draftReactionIds = [];
         state.status = "idle";
         state.error = null;
         state.loadingReactionId = null;
@@ -244,12 +304,27 @@ const calculationSlice = createSlice({
 
 export const { clearCurrentCalculation } = calculationSlice.actions;
 
-export const selectDraftInfo = (state: { calculations: CalculationState }) => state.calculations.draftInfo;
-export const selectCartStatus = (state: { calculations: CalculationState }) => state.calculations.cartStatus; 
-export const selectCurrentCalculation = (state: { calculations: CalculationState }) => state.calculations.currentCalculation;
-export const selectCalculationsHistory = (state: { calculations: CalculationState }) => state.calculations.history;
-export const selectCalculationsStatus = (state: { calculations: CalculationState }) => state.calculations.status;
-export const selectCalculationsError = (state: { calculations: CalculationState }) => state.calculations.error;
-export const selectLoadingReactionId = (state: { calculations: CalculationState }) => state.calculations.loadingReactionId;
+export const selectDraftInfo = (state: { calculations: CalculationState }) =>
+  state.calculations.draftInfo;
+export const selectDraftReactionIds = (state: {
+  calculations: CalculationState;
+}) => state.calculations.draftReactionIds;
+export const selectCartStatus = (state: { calculations: CalculationState }) =>
+  state.calculations.cartStatus;
+export const selectCurrentCalculation = (state: {
+  calculations: CalculationState;
+}) => state.calculations.currentCalculation;
+export const selectCalculationsHistory = (state: {
+  calculations: CalculationState;
+}) => state.calculations.history;
+export const selectCalculationsStatus = (state: {
+  calculations: CalculationState;
+}) => state.calculations.status;
+export const selectCalculationsError = (state: {
+  calculations: CalculationState;
+}) => state.calculations.error;
+export const selectLoadingReactionId = (state: {
+  calculations: CalculationState;
+}) => state.calculations.loadingReactionId;
 
 export default calculationSlice.reducer;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch } from "../../store/store";
@@ -6,6 +6,7 @@ import { selectIsAuthenticated } from "../../slices/authSlice";
 import {
   addToDraft,
   selectLoadingReactionId,
+  selectDraftReactionIds,
 } from "../../slices/calculationSlice";
 import ImageWithFallback from "../ui/ImageWithFallback";
 import type { Reaction } from "../../types/models";
@@ -19,13 +20,18 @@ const ReactionCard: React.FC<Props> = ({ reaction }) => {
   const dispatch: AppDispatch = useDispatch();
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const loadingReactionId = useSelector(selectLoadingReactionId);
+  const draftReactionIds = useSelector(selectDraftReactionIds);
 
   const isLoading = loadingReactionId === reaction.id;
+  const isInCart = useMemo(
+    () => draftReactionIds.includes(reaction.id),
+    [draftReactionIds, reaction.id]
+  );
 
   const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    if (isLoading) return;
+    if (isLoading || isInCart) return;
     dispatch(addToDraft(reaction.id));
   };
 
@@ -64,11 +70,15 @@ const ReactionCard: React.FC<Props> = ({ reaction }) => {
 
           {isAuthenticated && (
             <button
-              className="add-to-cart-btn"
+              className={`add-to-cart-btn ${isInCart ? "in-cart" : ""}`}
               onClick={handleAddToCart}
-              disabled={isLoading}
+              disabled={isLoading || isInCart}
             >
-              {isLoading ? "Добавление..." : "В расчет"}
+              {isLoading
+                ? "Добавление..."
+                : isInCart
+                ? "В расчете"
+                : "В расчет"}
             </button>
           )}
         </div>
