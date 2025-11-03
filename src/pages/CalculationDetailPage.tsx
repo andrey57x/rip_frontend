@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import type { AppDispatch } from "../store/store";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -11,10 +11,12 @@ import {
   clearCurrentCalculation,
   moderate,
   deleteDraft,
+  updateKoef,
 } from "../slices/calculationSlice";
 import { selectUser } from "../slices/authSlice";
 import Breadcrumbs from "../components/layout/Breadcrumbs";
 import DraftReactionItem from "../components/draft/DraftReactionItem";
+import useDebounce from "../hooks/useDebounce";
 import "./CalculationDetailPage.css";
 
 const CalculationDetailPage: React.FC = () => {
@@ -28,18 +30,53 @@ const CalculationDetailPage: React.FC = () => {
   const status = useSelector(selectCalculationsStatus);
 
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const [koef, setKoef] = useState("1");
+  const debouncedKoef = useDebounce(koef, 500);
 
   const calculationId = id ? parseInt(id, 10) : draftInfo.id;
   const isDraft = !id && calculation?.calculation.status === "draft";
+
+  const sortedReactions = useMemo(() => {
+    if (!calculation?.reactions) return [];
+    return [...calculation.reactions].sort((a, b) =>
+      a.reaction.title.localeCompare(b.reaction.title)
+    );
+  }, [calculation?.reactions]);
 
   useEffect(() => {
     if (calculationId) {
       dispatch(fetchCalculationDetails(calculationId));
     }
     return () => {
-      dispatch(clearCurrentCalculation());
+      if (id) {
+        dispatch(clearCurrentCalculation());
+      }
     };
-  }, [calculationId, dispatch]);
+  }, [calculationId, dispatch, id]);
+
+  useEffect(() => {
+    if (calculation?.calculation.output_koef) {
+      setKoef(calculation.calculation.output_koef.toString());
+    }
+  }, [calculation?.calculation.id]);
+
+  useEffect(() => {
+    if (isDraft && calculationId) {
+      const numericKoef = parseFloat(debouncedKoef);
+      if (
+        !isNaN(numericKoef) &&
+        numericKoef !== calculation?.calculation.output_koef
+      ) {
+        dispatch(updateKoef({ id: calculationId, output_koef: numericKoef }));
+      }
+    }
+  }, [
+    debouncedKoef,
+    isDraft,
+    calculationId,
+    calculation?.calculation.output_koef,
+    dispatch,
+  ]);
 
   useEffect(() => {
     if (
@@ -165,6 +202,22 @@ const CalculationDetailPage: React.FC = () => {
           </div>
         )}
 
+        {calculation && (
+          <div className="koef-panel">
+            <label htmlFor="output_koef">Общий коэффициент выхода:</label>
+            <input
+              id="output_koef"
+              type="number"
+              step="0.01"
+              min="0.01"
+              max="1"
+              value={koef}
+              onChange={(e) => setKoef(e.target.value)}
+              readOnly={!isDraft}
+            />
+          </div>
+        )}
+
         {isLoading ? (
           <div className="loading-spinner">Загрузка...</div>
         ) : isEmpty ? (
@@ -172,7 +225,7 @@ const CalculationDetailPage: React.FC = () => {
         ) : (
           <>
             <div className="draft-item-list">
-              {calculation.reactions.map((item) => (
+              {sortedReactions.map((item) => (
                 <DraftReactionItem
                   key={item.reaction.id}
                   item={item}

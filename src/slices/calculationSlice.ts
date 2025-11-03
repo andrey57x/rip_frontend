@@ -18,6 +18,7 @@ interface CalculationState {
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
   loadingReactionId: number | null;
+  updatingMassReactionIds: number[];
 }
 
 const initialState: CalculationState = {
@@ -29,6 +30,7 @@ const initialState: CalculationState = {
   status: "idle",
   error: null,
   loadingReactionId: null,
+  updatingMassReactionIds: [],
 };
 
 export const fetchDraftInfo = createAsyncThunk(
@@ -126,6 +128,18 @@ export const deleteDraft = createAsyncThunk(
   }
 );
 
+export const updateKoef = createAsyncThunk(
+  "calculations/updateKoef",
+  async (params: { id: number; output_koef: number }, { rejectWithValue }) => {
+    try {
+      await api.updateCalculationKoef(params.id, params.output_koef);
+      return params.output_koef;
+    } catch (error: any) {
+      return rejectWithValue("Failed to update coefficient");
+    }
+  }
+);
+
 export const removeFromDraft = createAsyncThunk(
   "calculations/removeFromDraft",
   async (
@@ -138,8 +152,7 @@ export const removeFromDraft = createAsyncThunk(
         params.reactionId
       );
       dispatch(fetchDraftInfo());
-      dispatch(fetchCalculationDetails(params.calculationId));
-      dispatch(fetchDraftReactionIds(params.calculationId));
+      return params.reactionId;
     } catch (error: any) {
       return rejectWithValue("Failed to remove item from draft");
     }
@@ -215,6 +228,21 @@ const calculationSlice = createSlice({
         state.error = action.payload as string;
         state.loadingReactionId = null;
       })
+      .addCase(
+        removeFromDraft.fulfilled,
+        (state, action: PayloadAction<number>) => {
+          const removedId = action.payload;
+          if (state.currentCalculation) {
+            state.currentCalculation.reactions =
+              state.currentCalculation.reactions.filter(
+                (item) => item.reaction.id !== removedId
+              );
+          }
+          state.draftReactionIds = state.draftReactionIds.filter(
+            (id) => id !== removedId
+          );
+        }
+      )
       .addCase(fetchCalculationDetails.pending, (state) => {
         state.status = "loading";
       })
@@ -270,11 +298,22 @@ const calculationSlice = createSlice({
       .addCase(deleteDraft.rejected, (state) => {
         state.status = "failed";
       })
+      .addCase(updateKoef.fulfilled, (state, action) => {
+        if (state.currentCalculation) {
+          state.currentCalculation.calculation.output_koef = action.payload;
+        }
+      })
+      .addCase(updateMass.pending, (state, action) => {
+        state.updatingMassReactionIds.push(action.meta.arg.reactionId);
+      })
       .addCase(
         updateMass.fulfilled,
         (state, action: PayloadAction<api.UpdateMassPayload>) => {
+          const { reactionId, output_mass } = action.payload;
+          state.updatingMassReactionIds = state.updatingMassReactionIds.filter(
+            (id) => id !== reactionId
+          );
           if (state.currentCalculation) {
-            const { reactionId, output_mass } = action.payload;
             const reactionIndex = state.currentCalculation.reactions.findIndex(
               (r) => r.reaction.id === reactionId
             );
@@ -285,6 +324,12 @@ const calculationSlice = createSlice({
           }
         }
       )
+      .addCase(updateMass.rejected, (state, action) => {
+        const { reactionId } = action.meta.arg;
+        state.updatingMassReactionIds = state.updatingMassReactionIds.filter(
+          (id) => id !== reactionId
+        );
+      })
       .addCase(confirmCalculation.fulfilled, (state) => {
         state.currentCalculation = null;
         state.draftReactionIds = [];
@@ -298,6 +343,7 @@ const calculationSlice = createSlice({
         state.status = "idle";
         state.error = null;
         state.loadingReactionId = null;
+        state.updatingMassReactionIds = [];
       });
   },
 });
@@ -326,5 +372,8 @@ export const selectCalculationsError = (state: {
 export const selectLoadingReactionId = (state: {
   calculations: CalculationState;
 }) => state.calculations.loadingReactionId;
+export const selectUpdatingMassReactionIds = (state: {
+  calculations: CalculationState;
+}) => state.calculations.updatingMassReactionIds;
 
 export default calculationSlice.reducer;

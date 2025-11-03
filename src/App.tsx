@@ -1,10 +1,14 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
 } from "react-router-dom";
+import type { AppDispatch } from "./store/store";
+import { selectIsAuthenticated } from "./slices/authSlice";
+import { fetchDraftInfo } from "./slices/calculationSlice";
 import AppNavbar from "./components/layout/AppNavbar";
 import HomePage from "./pages/HomePage";
 import ReactionsPage from "./pages/ReactionsPage";
@@ -19,6 +23,15 @@ import "./App.css";
 import { ROUTER_BASENAME } from "./config/sharedConfig";
 
 const App: React.FC = () => {
+  const dispatch: AppDispatch = useDispatch();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchDraftInfo());
+    }
+  }, [isAuthenticated, dispatch]);
+
   return (
     <Router basename={ROUTER_BASENAME}>
       <AppNavbar />

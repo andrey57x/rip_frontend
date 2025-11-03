@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import type { AppDispatch } from "../store/store";
 import Breadcrumbs from "../components/layout/Breadcrumbs";
@@ -31,6 +31,10 @@ const ReactionsPage: React.FC = () => {
     error,
     setFiltersAndFetch,
   } = useFetchReactions();
+
+  const sortedReactions = useMemo(() => {
+    return [...reactions].sort((a, b) => a.title.localeCompare(b.title));
+  }, [reactions]);
 
   useEffect(() => {
     if (isInitialMount.current) {
@@ -86,7 +90,7 @@ const ReactionsPage: React.FC = () => {
       {error && <p className="error-message">{error}</p>}
       {loading && <p>Загрузка...</p>}
 
-      {!loading && <ReactionsGrid reactions={reactions} />}
+      {!loading && <ReactionsGrid reactions={sortedReactions} />}
     </main>
   );
 };

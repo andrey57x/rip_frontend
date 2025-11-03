@@ -48,6 +48,31 @@
     justify-content: flex-end;
 }
 
+.koef-panel {
+    background-color: #fff;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    box-shadow: 0 6px 18px rgba(17,51,85,0.06);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 1.1rem;
+}
+
+.koef-panel label {
+    font-weight: 600;
+    color: var(--brand-dark);
+}
+
+.koef-panel input {
+    padding: 8px 12px;
+    border: 1px solid #cddde8;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    width: 100px;
+}
+
 .moderation-panel button {
     border: none;
     padding: 10px 20px;
