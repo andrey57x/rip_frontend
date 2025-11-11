@@ -2,3 +2,9 @@
 src_contents.txt
 *.key
 *.env
+*.log
+.DS_Store
+node_modules/
+build/
+.vscode/
+.idea/
