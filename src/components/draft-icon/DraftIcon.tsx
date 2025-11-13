@@ -1,6 +1,5 @@
 import React from "react";
 import "./DraftIcon.css";
-import { MINIO_PATH } from "../../config/config";
 
 type Props = {
   count?: number;
@@ -10,7 +9,10 @@ type Props = {
 const DraftIcon: React.FC<Props> = ({ count = 0, iconUrl }) => {
   const isActive = count > 0;
 
-  const finalIconUrl = iconUrl ? `${MINIO_PATH}${iconUrl}` : "";
+  let a = iconUrl;
+  iconUrl = a;
+
+  const finalIconUrl = "./img/calculator.png";
 
   return (
     <a

@@ -1,5 +1,5 @@
 import React from "react";
-import { DEFAULT_IMG, MINIO_PATH } from "../../config/config";
+import { DEFAULT_IMG, LOCAL_MINIO_URL } from "../../config/config";
 
 type Props = {
   src?: string | null;
@@ -16,7 +16,7 @@ const ImageWithFallback: React.FC<Props> = ({
   style,
   lazy = true,
 }) => {
-  const finalSrc = src ? `${MINIO_PATH}${src}` : DEFAULT_IMG;
+  const finalSrc = src ? `${LOCAL_MINIO_URL}${src}` : DEFAULT_IMG;
 
   const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     const img = e.currentTarget;

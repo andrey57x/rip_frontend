@@ -1,4 +1,4 @@
-import { API_BASE, USE_MOCK } from "../config/config";
+import { LOCAL_BACKEND_URL, API_BASE, USE_MOCK } from "../config/config";
 import type { Reaction } from "../types/models";
 import mockReactions from "../mock/reactions.json";
 
@@ -19,6 +19,8 @@ const toQuery = (filters?: Filters) => {
   return s ? `?${s}` : "";
 };
 
+const FULL_API_URL = `${LOCAL_BACKEND_URL}${API_BASE}`;
+
 export async function getReactions(
   filters?: Filters,
   signal?: AbortSignal
@@ -27,7 +29,7 @@ export async function getReactions(
     return Promise.resolve(mockReactions as Reaction[]);
   }
   const qs = toQuery(filters);
-  const url = `${API_BASE}/reactions${qs}`;
+  const url = `${FULL_API_URL}/reactions${qs}`;
 
   const res = await fetch(url, { signal, credentials: "include" });
   if (!res.ok) {
@@ -46,7 +48,7 @@ export async function getReaction(
       null;
     return Promise.resolve(found);
   }
-  const url = `${API_BASE}/reactions/${id}`;
+  const url = `${FULL_API_URL}/reactions/${id}`;
 
   const res = await fetch(url, { signal, credentials: "include" });
   if (!res.ok) {
@@ -58,7 +60,7 @@ export async function getReaction(
 export async function getCartInfo(
   signal?: AbortSignal
 ): Promise<{ id: number; reactions_count: number; cart_icon?: string }> {
-  const url = `${API_BASE}/mass-calculations/mass-calculation-cart-icon`;
+  const url = `${FULL_API_URL}/mass-calculations/mass-calculation-cart-icon`;
 
   const res = await fetch(url, { signal, credentials: "include" });
   if (!res.ok) {
