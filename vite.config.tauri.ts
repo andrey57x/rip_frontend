@@ -6,12 +6,11 @@ import {
   FRONT_PORT,
   LOCAL_BACKEND_URL,
   LOCAL_MINIO_URL,
-  ROUTER_BASENAME,
 } from "./src/config/sharedConfig";
 
 export default defineConfig({
   plugins: [react(), VitePWA({ registerType: "autoUpdate" })],
-  base: ROUTER_BASENAME,
+  base: "./",
   server: {
     host: FRONT_HOST,
     port: FRONT_PORT,

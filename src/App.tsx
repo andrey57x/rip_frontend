@@ -1,6 +1,6 @@
 import React from "react";
 import {
-  BrowserRouter as Router,
+  HashRouter as Router,
   Routes,
   Route,
   Navigate,
@@ -10,11 +10,10 @@ import HomePage from "./pages/HomePage";
 import ReactionsPage from "./pages/ReactionsPage";
 import ReactionDetailPage from "./pages/ReactionDetailPage";
 import "./App.css";
-import { ROUTER_BASENAME } from "./config/sharedConfig";
 
 const App: React.FC = () => {
   return (
-    <Router basename={ROUTER_BASENAME}>
+    <Router>
       <AppNavbar />
       <Routes>
         <Route path="/" element={<HomePage />} />
